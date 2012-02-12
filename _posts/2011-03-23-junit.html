@@ -1,0 +1,133 @@
+---
+name: junit
+layout: post
+title: Новинки JUnit. Категории 
+time: 2011-03-23 13:38:00 +02:00
+---
+
+<p>В последнее время во всех проектах где я принимаю участие не обходится без автоматизированного тестирования. Везде есть unit тесты, плюс разработку часто сопровождают попытки покрыть код тестами на Selenium.</p>
+<p>Первый вопрос который стоит перед командой при написании автоматизированных тестов -- как мы будем запускать тесты? Точнее -- какой фреймворк для тестирования нам выбрать? Если мы программируем на Java, выбор не велик. JUnit или TestNG.</p>
+
+<p>
+Помню, когда мы начинали заниматься функциональными тестами на нашем последнем проекте, мы долго решали что же выбрать. Победил TestNG. Легкость создания test suit'a, возможность группировать тесты и запускать их параллельно -- вот что определило наш выбор. В тот момент я подписался на интересные блоги и рассылки связанные с тестированием, и через некоторое время обнаружил, что JUnit активно развивается и догоняет TestNG по функциональности, при этом превосходит его в продуманности API.
+</p>
+
+<p>
+Так, в JUnit начиная с версии 4.8 появился механизм для метки и группировки тестов, под названием Categories.
+</p>
+
+<p>
+Процесс группировки тестов в JUnit до появления категорий можно стравнить с организацией писем в Microsoft Outlook. Мы можем группировать тест методы в классы, а классы в пакеты.
+</p>
+
+<p>
+Теперь, с помощью категорий, группировка тестов похожа на группировку писем в GMail.
+</p>
+
+<p>
+Представляются категории в виде java интерфейсов, что дает приемущества по сравнению с группами в TestNG. В отличии от строковых констант коими являются группы, мы можем переименовывать категории в IDE, плюс есть возможность построить йерархии категорий, что дает нам гибкость в организации тестов.
+</p>
+
+<p>
+Предположим, что у нас есть 4 категории: <i>SmokeTest</i> говорит что наш тест - смоук тест, <i>BrokenTest</i> показывает, что тест тестирует поломанный функционал, а с помощью <i>FastTest</i> и <i>SlowTest</i> мы помечаем тесты по времени выполнения.
+</p>
+
+{% highlight java %}
+public interface SmokeTest {}
+
+public interface BrokenTest {}
+
+public interface FastTest {}
+
+public interface SlowTest {}
+
+
+{% endhighlight %}
+<p>
+Допустим у нас есть два тест класса с помеченными методами:
+</p>
+
+{% highlight java %}
+@Category(SmokeTest.class)
+public class SomeSmokeTests {
+  @Test
+  @Category(FastTest.class)
+  public void someFastTest() {
+    // test something
+  }
+
+  @Test
+  @Category(SlowTest.class)
+  public void someReallySlowTest() {
+    // test something
+  }
+}
+
+{% endhighlight %}
+
+{% highlight java %}
+public class SomeTestCase {
+
+  @Test
+  @Category({SmokeTest.class, FastTest.class})
+  public void fastSmokeTest() {
+    // test something
+  }
+
+  @Test
+  @Category({SmokeTest.class, FastTest.class, BrokenTest.class})
+  public void fastBrokenSmokeTest() {
+    // test something
+  }
+  
+  @Test
+  @Category({SmokeTest.class, SlowTest.class})
+  public void slowSmokeTest() {
+    // test something
+  }
+
+}
+{% endhighlight %}
+
+<p>
+С помощью категорий мы можем построить test suite, который будет запускать быстрые smoke тесты с работающим функционалом:
+</p> 
+
+{% highlight java %}
+@RunWith(Categories.class)
+@IncludeCategory(SmokeTest.class, FastTest.class)
+@ExcludeCategory(BrokenTest.class)
+@SuiteClasses(SomeSmokeTests.class, SomeTestCase.class)
+public class RunFastSmokeTestCases {}
+
+{% endhighlight %}
+<p>
+Правда, с увеличением количества классов в suite, конфигурация получаеться громоздкой, а куча аннотаций никак не добавляет читабельности коду.
+</p>
+
+<p>
+К счастью эта проблема решается с помощью библиотеки <a href="https://github.com/mairbek/junit-suite-configurator">junit-suite-configurator</a>. Так выглядит конфигурация эта же конфигурация написанная с ее помощью:
+</p>
+
+{% highlight java %}
+@RunWith(Suite.Configuration.class)
+public class Suite {
+
+  public static class Configuration extends AbstractConfiguration {
+
+  public Configuration(Class testClass) {
+    super(testClass);
+  }
+
+  @Override
+  protected void configure() {
+    run(classes(SomeSmokeTests.class, SomeTestCase.class))
+      .filter(includeCategories(SmokeTest.class, FastTest.class))
+      .filter(excludeCategories(BrokenTest.class))
+        .applyRule(new Rule1())
+    ).invokeIn(singleThread());
+  }
+ }
+}
+
+{% endhighlight %}

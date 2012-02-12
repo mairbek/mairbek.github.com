@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Mairbek Khadikov</title>
+    <meta name="description" content="Personal web site of Mairbek Khadikov">
+    <meta name="author" content="Mairbek Khadikov [mairbek.khadikov at gmail dot com]">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+      .container > footer p {
+      	text-align: right;
+      }
+      .photoblock {
+      	text-align: center;
+      }
+    </style>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Mairbek Khadikov</a>
+          <ul class="nav">
+            <li><a href="http://khadikov.blogspot.com">Blog</a></li>
+            <li><a href="http://github.com/mairbek">Projects</a></li>
+            <li><a href="http://ua.linkedin.com/in/mairbekkhadikov">Resume</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="container">
+
+      <h1>{{page.title}}&nbsp;&nbsp;<small>{{ page.date | date: "%B %d, %Y" }}</small></h1>
+      
+      <div class="content">
+        {{content}} 
+      </div>
+
+      <footer>
+        <p>&copy; Mairbek Khadikov, 2011</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>
