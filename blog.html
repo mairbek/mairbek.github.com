@@ -1,0 +1,11 @@
+---
+layout: default
+title: Mairbek Khadikov
+---
+
+{% for post in site.posts %}
+<div class="well">
+  <h2 class="title"><a href="{{ post.url }}">{{ post.title }}</a> <small>{{ post.date | date: "%B %d, %Y" }}</small></h2>
+  <p>{{post.content | strip_html | truncatewords:80}}</p>
+</div>
+{% endfor %}
