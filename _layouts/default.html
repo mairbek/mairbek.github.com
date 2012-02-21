@@ -26,14 +26,11 @@
       }
     </style>
 
-    <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="images/favicon.ico">
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
-
     <link rel="alternate" type="application/atom+xml" title="Mairbek Khadikov" href="http://feeds.feedburner.com/mkhadikov">
     <link href="http://feeds.feedburner.com/mkhadikov" rel="alternate" title="Mairbek Khadikov" type="application/atom+xml" />
+
+    <link href="/static/css/prettify.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="/static/js/prettify.js"></script>
 
     <script type="text/javascript">
 
@@ -51,7 +48,7 @@
  
   </head>
 
-  <body>
+  <body onload="prettyPrint()">
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
       var js, fjs = d.getElementsByTagName(s)[0];

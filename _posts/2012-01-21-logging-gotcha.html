@@ -22,12 +22,12 @@ time: 2012-01-21 09:49:00 +02:00
 <p>Обычно запись в лог выглядит довольно просто:</p>
 
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 log.error("SOMETHING REALLY BAD HAPPENED")
 log.warn("Something bad happened")
 log.info("Startup")
 log.debug("Processing request" + request)
-{% endhighlight %}
+</pre>
 
 <p>
 Уровни логгирования легко конфигурируются, так что мы можем наблюдать debug информацию при разработке и видеть чистый лог в продакшне.
@@ -36,11 +36,11 @@ log.debug("Processing request" + request)
 До сих пор, строки кода в open source библиотеках вида:
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 if (log.isDebugEnabled()) {
     log.debug("Processing request" + request);
 }
-{% endhighlight %}
+</pre>
 
 <p>
 вызывали недоумения: зачем это нужно, ведь запись в лог будет лишь при включенном дебаге, соответсвенно проверка влюченности дебага попахивает излишеством.
@@ -70,12 +70,12 @@ if (log.isDebugEnabled()) {
 Вместо конкатенации строк при логировании
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 log.debug("Processed request " + request + " sending response " + response);
-{% endhighlight %}
+</pre>
 писать
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 log.debug("Processed request {} sending response {}", request, response);
-{% endhighlight %}
+</pre>
 

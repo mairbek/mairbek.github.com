@@ -40,7 +40,7 @@ API Caliper в чем то напоминает старую версию JUnit.
 Caliper изначально поставляется с большим количеством примеров. Один из интересных <i>LoopingBackwardsBenchmark</i>, который сравнивает скорость итерирования вперед и назад.
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 public class LoopingBackwardsBenchmark extends SimpleBenchmark {
     @Param({"2", "20", "2000", "2000000", "20000000", "200000000"})
     private int max;
@@ -76,7 +76,7 @@ public class LoopingBackwardsBenchmark extends SimpleBenchmark {
 }
 
 
-{% endhighlight %}
+</pre>
 
 <p>
 Запустив тест мы убедимся, что разницы в производительности нет.
@@ -87,7 +87,7 @@ public class LoopingBackwardsBenchmark extends SimpleBenchmark {
 </p>
 
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 public class DoubleVsBigDecimalBenchmark extends SimpleBenchmark {
     @Param({"1", "1.01", "1.0123456789", "20", "20.01", "20.0123456789", "1000000000", "1000000000.01", "1000000000.0123456789"})
     private double value;
@@ -125,7 +125,7 @@ public class DoubleVsBigDecimalBenchmark extends SimpleBenchmark {
     }
 
 }
-{% endhighlight %}
+</pre>
 
 <p>
 Прогнав тест, становится видно, что для небольших чисел и чисел с небольшой дробной частью <i>BigDecimal</i> работает в 5 раз медленней, а для больших чисел либо чисел с большим количеством символов после запятой в 20 раз.

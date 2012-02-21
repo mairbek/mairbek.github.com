@@ -32,7 +32,7 @@ time: 2011-03-23 13:38:00 +02:00
 Предположим, что у нас есть 4 категории: <i>SmokeTest</i> говорит что наш тест - смоук тест, <i>BrokenTest</i> показывает, что тест тестирует поломанный функционал, а с помощью <i>FastTest</i> и <i>SlowTest</i> мы помечаем тесты по времени выполнения.
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 public interface SmokeTest {}
 
 public interface BrokenTest {}
@@ -42,12 +42,12 @@ public interface FastTest {}
 public interface SlowTest {}
 
 
-{% endhighlight %}
+</pre>
 <p>
 Допустим у нас есть два тест класса с помеченными методами:
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 @Category(SmokeTest.class)
 public class SomeSmokeTests {
   @Test
@@ -63,9 +63,9 @@ public class SomeSmokeTests {
   }
 }
 
-{% endhighlight %}
+</pre>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 public class SomeTestCase {
 
   @Test
@@ -87,20 +87,20 @@ public class SomeTestCase {
   }
 
 }
-{% endhighlight %}
+</pre>
 
 <p>
 С помощью категорий мы можем построить test suite, который будет запускать быстрые smoke тесты с работающим функционалом:
 </p> 
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 @RunWith(Categories.class)
 @IncludeCategory(SmokeTest.class, FastTest.class)
 @ExcludeCategory(BrokenTest.class)
 @SuiteClasses(SomeSmokeTests.class, SomeTestCase.class)
 public class RunFastSmokeTestCases {}
 
-{% endhighlight %}
+</pre>
 <p>
 Правда, с увеличением количества классов в suite, конфигурация получаеться громоздкой, а куча аннотаций никак не добавляет читабельности коду.
 </p>
@@ -109,7 +109,7 @@ public class RunFastSmokeTestCases {}
 К счастью эта проблема решается с помощью библиотеки <a href="https://github.com/mairbek/junit-suite-configurator">junit-suite-configurator</a>. Так выглядит конфигурация эта же конфигурация написанная с ее помощью:
 </p>
 
-{% highlight java %}
+<pre class="prettyprint lang-java">
 @RunWith(Suite.Configuration.class)
 public class Suite {
 
@@ -130,4 +130,4 @@ public class Suite {
  }
 }
 
-{% endhighlight %}
+</pre>
