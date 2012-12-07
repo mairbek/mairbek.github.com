@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Asynchronous RPC with Finagle - Mairbek Khadikov</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+        <h2>Asynchronous RPC with <a href="http://github.com/twitter/finagle">Finagle</a></h2>
+          <br/>
+					<h4>Dev-Time, Kharkiv</h4>
+          <br/>
+					<p>
+						<small>By <a href="http://mairbek.github.com">Mairbek Khadikov</a> / <a href="http://twitter.com/mairbek">@mairbek</a></small>
+					</p>
+				</section>
+
+        <!--
+				<section>
+					<h2>About Me</h2>
+					<p>
+						<img src="khadikov.jpg"/>
+					</p>
+					<ul>
+						<li>Geek</li>
+					</ul>
+				</section>
+        -->
+
+				<section>
+					<h3>
+						How many of you are working on distributed systems?
+					</h3>
+					<br/>
+					<ul>
+						<li class="fragment">Do you use databases?</li>
+						<li class="fragment">Or caching servers?</li>
+						<li class="fragment">Or integration with REST Service?</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Most servers are also clients</h2>
+					<br/>
+					<p>
+						<ul>
+							<li class="fragment">Http server</li>
+							<li class="fragment">Mysql client</li>
+							<li class="fragment">Memcached client</li>
+							<li class="fragment">Http client</li>
+						</ul>
+						</span>
+					</p>
+				</section>
+
+				<section>
+					<h2>Same principle - different implementations</h2>
+					<br/>
+					<p>
+						<ul>
+							<li class="fragment">Jdbc driver</li>
+							<li class="fragment">Memcached</li>
+							<li class="fragment">Http</li>
+							<li class="fragment">Thrift</li>
+							<li class="fragment">Protobuf</li>
+							<li class="fragment">Etc.</li>
+						</ul>
+						</span>
+					</p>
+				</section>
+
+				<section>
+					<h2>Message passing</h2>
+					<br/>
+					<p>
+						<ul>
+							<li>Send message</li>
+							<li>Wait for a while</li>
+							<li>Process response</li>
+						</ul>
+						</span>
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Service</h2>
+					<br/>
+					<p>Is just a function<pre><code contenteditable>
+trait Service[Req, Res] = Req => Rep
+					</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Server</h2>
+					<p>
+						<img src="finagle_client_server.png">
+					</p>
+					<p>Something that implements <i>Service</i></p>
+				</section>
+
+
+				<section>
+					<h2>Client</h2>
+					<p>
+						<img src="finagle_client_server.png">
+					</p>
+					<p>Something that uses <i>Service</i></p>
+				</section>
+
+
+				<section>
+					<h3>
+						Most of the services these days are I/O bound instead of CPU bound 
+					</h3>
+					<br/>
+					<ul>
+						<li class="fragment">If you care about performance</li>
+						<li class="fragment">If you design for low latency and high throughput</li>
+					</ul>
+
+				</section>
+
+				<section>
+					<h2>Blocking I/O</h2>
+					<p>
+						Most of the time application waits for I/O operation to be completed
+					</p>
+				</section>
+
+				<section>
+					<h2>Non-blocking I/O</h2>
+					<p>
+						Use resources to do the job instead of waiting for I/O
+					</p>
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+
+					<br/>
+					<h3>Synchronous<h3>
+					<br/>
+					<p><pre><code contenteditable>
+interface UserService {
+	User getUser(String email);
+}
+					</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+
+					<br/>
+					<h3>Hollywood principle</h3>
+					<br/>
+					<p>
+						Don't call us, we'll call you! 
+					</p>
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+					<br/>
+					<h3>Asynchronous with callback</h3>
+					<br/>
+					<p><pre><code contenteditable>
+
+interface UserCallback {
+
+	void onComplete(User user);
+
+	void onFailure(Throwable error);
+
+}
+
+interface UserService {
+	void getUser(String email, UserCallback callback);
+}
+
+					</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Callbacks don't compose well </h2>
+					<p>
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Callbacks don't compose well</h2>
+					<p>
+						Try to implement sequence of asynchronous calls
+					</p>
+				</section>
+
+				<section>
+					<h2>Callbacks don't compose well</h2>
+					<p>
+						Try to combine result of concurrent asynchronous calls
+					</p>
+				</section>
+
+				<section>
+					<h2>Callback is a wrong abstraction</h2>
+					<p>
+						Languages are simply designed for serial execution
+					</p>
+				</section>
+        <!--
+				<section>
+					<h2>Callback is a wrong abstraction</h2>
+					<p>
+						Well try to cancel asynchronous request with callback
+					</p>
+				</section>
+        -->
+				<section>
+					<h2>Asynchronous Service</h2>
+					<br/>
+					<p><pre><code contenteditable>
+trait Service[Req, Res] = Req => Future[Rep]
+					</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Future</h2>
+					<p>Represents a computation that has not yet completed, which can either succeed or fail</p>
+				</section>
+
+				<section>
+					<h2>Future</h2>
+					<p>Usually computed concurrently</p>
+				</section>
+
+				<section>
+					<h2>Future (Blocking)</h2>
+					<br/>
+					<p><pre><code contenteditable>
+trait Future[A]
+
+// Get value. Blocks until completed
+val f : Future[A]
+println(f())
+
+// Get value with timeout
+val f : Future[A]
+println(f(1.second))
+
+// Can throw exception
+f.get() match {
+  case Return(res) => ...
+  case Throw(exc) => ...
+}
+
+					</code></pre></p>
+				</section>
+
+				<section>
+					<h2>Future (Async)</h2>
+					<br/>
+					<p><pre><code contenteditable>
+// Good old callback
+
+val f: Future[String]
+
+f onSuccess { s =>
+  log.info(s)
+} onFailure { e =>
+  log.error(e)
+}
+					</code></pre></p>
+				</section>
+
+				<section>
+					<h2>Futures compose well</h2>
+					<p></p>
+				</section>
+
+				<section>
+					<h2>Future is a Monad </h2>
+					<p></p>
+				</section>
+
+        <!--
+				<section>
+					<h2>Wait, Monad?</h2>
+					<p>
+						<img class="fragment" src="culkin-1.jpg"/>
+					</p>
+				</section>
+
+				<section>
+					<h2>Math??</h2>
+					<p>
+						<img class="fragment" src="culkin-2.gif"/>
+					</p>
+				</section>
+
+				<section>
+					<h2>Category Theory???</h2>
+					<p>
+						<img class="fragment" src="culkin.jpg"/>
+					</p>
+				</section>
+        -->
+				<section>
+					<h2>Monad for Humans</h2>
+					<p>
+						Fancy control-flow
+					</p>
+				</section>
+
+				<section>
+					<h2>Future as a Functor</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+
+def map[B](f: A => B): Future[B]	
+
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Future as a Functor</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+
+def map[B](f: A => B): Future[B]	
+
+val f : Future[List[User]]
+val fcount = f.map(_.size)
+println(fcount())
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Functor is cool, but</h2>
+					<p><pre><code contenteditable>
+
+val fUser : Future[UserData] = getUserData(token)
+val fFriends = fUser.map(user => getFriends(user))
+println(fFriends()) // Future[Future[List[User]]]
+					</pre></code></p>
+				</section>
+
+				<section>
+					<h2>flatMap to rescue</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+def flatMap[B](f: A => Future[B]): Future[B]
+					</pre></code></p>
+				</section>
+
+
+
+				<section>
+					<h2>flatMap</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+val f = userIdGenerator.generateId flatMap {id => 
+	facebookClient.getUserData(token) flatMap {userData=>
+		userRepository.addUser(id, userData) flatMap {_=>
+			notificationService.sendEmail(userData.email).map(_=>id)
+		}
+	}
+}
+
+println(f.get)
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>For comprehension</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+val f = for {
+	id <- userIdGenerator.generateId
+	userData <- facebookClient.getUserData(token)
+	_ <- userRepository.addUser(id, userData)
+	_ <- notificationService.sendEmail(userData.email)
+} yield (id)
+
+println(f.get)
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Other Monads</h2>
+					<ul>
+						<li>Option</li>
+						<li>List</li>
+						<li>State</li>
+						<li>etc.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Concurrent compositions</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+def collect[A](fs: Seq[Future[A]]): Future[Seq[A]]
+
+def join(fs: Seq[Future[_]]): Future[Unit]
+
+def select(fs: Seq[Future[A]]) : Future[(Try[A], Seq[Future[A]])]
+
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Promise</h2>
+					<br/>	
+					<p>Writable future</p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Promise</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+
+val p = new Promise[String]
+
+p.setValue("Hello")
+
+p.setException(new RuntimeException)
+
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Filters</h2>
+					<p>
+						<img src="Filters.png" />
+					</p>
+				</section>
+
+				<section>
+					<h2>Filter common use cases</h2>
+					<p>
+						<ul>
+							<li>Retries</li>
+							<li>Exception handling</li>
+							<li>Authentication</li>
+							<li>Tracing</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Filter is just a function</h2>
+
+					<p><pre><code contenteditable>
+(ReqIn, Service[ReqOut, RepIn]) => Future[RepOut]
+					</code></pre></p>					
+				</section>
+
+				<section>
+					<h2>Composing filters and services</h2>
+
+					<p><pre><code contenteditable>
+val authRequred: Filter[Req, Rep, Req, Rep]
+val service: Service[Req, Rep]
+
+val secureService = authRequred andThen service
+</code></pre></p>
+				</section>
+
+				<section>
+					<h2>Codec</h2>
+
+					<h3>Encodes and decodes protocols
+					</h3>					
+				</section>
+
+				<section>
+					<h2>Supported protocols</h2>
+
+					<ul>
+						<li>Http</li>
+						<li>Thrift</li>
+						<li>memcache</li>
+						<li>Http streaming</li>
+						<li>MySQL</li>
+						<li>PostgreSQL</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Based on Netty</h2>
+					<p>
+						<img src="FinagleRelationship.png" />
+					</p>
+				</section>
+
+				<section>
+        <h2>Codec</h2>
+        <h3>is a ChannelPipeline</h3>
+				</section>
+
+				<section>
+					<h2>Building Server</h2>
+
+					<p><pre><code contenteditable>
+object SimpleHttp extends Service[HttpRequest, HttpResponse] {
+  def apply(request: HttpRequest) = {
+    val response = new DefaultHttpResponse(HTTP_1_1, OK)
+    response.setContent(copiedBuffer("Hello #devtime", UTF_8))
+    Future.value(response)
+  }
+}
+</code></pre></p>
+
+				</section>
+
+
+				<section>
+					<h2>Building Server</h2>
+
+					<p><pre><code contenteditable>
+val server = ServerBuilder()
+	.codec(Http)
+	.bindTo(new InetSocketAddress(8080))
+	.build(SimpleHttp)
+
+</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Building Client</h2>
+
+					<p><pre><code contenteditable>
+val client = ClientBuilder()
+  .codec(Http())
+  .hosts(new InetSocketAddress(8080))
+  .hostConnectionLimit(1)
+  .build()
+
+val request = new DefaultHttpRequest(HTTP_1_1, Get, "/")
+val response = client(request)
+
+</code></pre></p>
+
+				</section>
+				
+				<section>
+					<h2>Service Discovery</h2>
+
+					<h3>
+						Automatic registration and discovery of services
+					</h3>
+				</section>
+
+
+
+				<section>
+					<h2>Cluster</h2>
+
+					<p>
+						<ul>
+							<li>Static cluster</li>
+							<li>Dynamic cluster</li>
+							<li>ZooKeeper cluster</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Registering Service</h2>
+
+					<p>
+						<pre>
+							<code contenteditable>
+val serviceAddress = new InetSocketAddress(...)
+val server = ServerBuilder()
+  .bindTo(serviceAddress)
+  .build()
+
+cluster.join(serviceAddress)
+
+							</code>
+						</pre>
+					</p>
+				</section>
+
+
+
+				<section>
+					<h2>Using cluster from client</h2>
+
+					<p>
+						<pre>
+							<code contenteditable>
+val client = ClientBuilder()
+  .cluster(cluster)
+  .hostConnectionLimit(1)
+  .codec(new StringCodec)
+  .build()
+							</code>
+						</pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>Other abstractions</h2>
+
+					<p>
+						<ul>
+							<li>Spool</li>
+							<li>Broker/Offer</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Spool</h2>
+
+					<h3>
+						Asynchronous stream
+					</h3>
+
+					<pre>
+						<code contenteditable>
+trait Spool[+A] {
+	def head: A
+
+	def tail: Future[Spool[A]]
+
+	def foreach[B](f: A => B)
+}
+
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>Broker/Offer</h2>
+
+					<h3>
+						Communication mechanism
+					</h3>
+
+				</section>
+
+				<section>
+					<h2>Broker</h2>
+
+					<h3>
+						Channel of communication
+					</h3>
+
+					<pre>
+						<code contenteditable>
+trait Broker[T] {
+  def send(msg: T): Offer[Unit]
+  val recv: Offer[T]
+}
+						</code>
+					</pre>
+				</section>
+
+
+				<section>
+					<h2>Offer</h2>
+					<h3>
+						Synchronization mechanism between sender and receiver
+					</h3>
+
+					<pre>
+						<code contenteditable>
+trait Offer[T] {
+  def sync(): Future[T]
+}
+						</code>
+					</pre>
+				</section>
+
+
+				<section>
+					<h2>Offer</h2>
+					<h3>
+						Synchronization mechanism between sender and receiver
+					</h3>
+
+					<pre>
+						<code contenteditable>
+val b: Broker[String]
+val sendOf = b.send("Hello")
+val recvOf = b.recv
+
+// Sender process
+sendOf.sync()
+
+// Receiver process
+recvOf.sync()
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>Broker/Offer</h2>
+					<h3>
+						Composes well
+					</h3>
+
+					<pre>
+						<code contenteditable>
+val q0 = new Broker[Int]
+val q1 = new Broker[Int]
+val q2 = new Broker[Int]
+
+val anyq: Offer[Int] = Offer.choose(q0.recv, q1.recv, q2.recv)
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<h2>Finatra</h2>
+
+					<p>
+						Sintara like web framework running on top of finagle
+					</p>
+				</section>
+
+				<section>
+					<h2>Finatra</h2>
+
+					<p>
+						<ul>
+							<li>Routing DSL</li>
+							<li>Templating</li>
+							<li>App Generator</li>
+						</ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Finatra</h2>
+
+					<p>Define controller</p>
+					<p>
+						<pre>
+							<code contenteditable>
+class ExampleApp extends Controller {
+  get("/") { request =>
+    render.plain("hello world").toFuture
+  }
+
+  get("/user/:username") { request =>
+    val username = request.routeParams.getOrElse("username", "default_user")
+    render.plain("hello " + username).toFuture
+  }
+}
+							</code>
+						</pre>
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Finatra</h2>
+					<p>Start the server</p>
+					<p>
+						<pre>
+							<code contenteditable>
+val app = new ExampleApp
+def main(args: Array[String]) = {
+  FinatraServer.register(app)
+  FinatraServer.start()
+}
+							</code>
+						</pre>
+					</p>
+				</section>
+
+
+				<section>
+					<h1>Further reading</h1>
+					<br/>
+					<p><a href="http://twitter.github.com/scala_school/">Scala school</a></p>
+					<p><a href="http://twitter.github.com/effectivescala">Effective Scala</a></p>
+					<p><a href="http://github.com/twitter/finagle">Finagle @ github</a></p>
+					<p><a href="http://github.com/capotej/finatra">Finatra @ github</a></p>
+				</section>
+
+				<section>
+					<h1>Thank You!</h1>
+					<br/>
+					<h2>Mairbek Khadikov</h2>
+					<br/>
+					<p><a href="http://mairbek.github.com">mairbek.github.com</a></p>
+					<p><a href="http://twitter.com/mairbek">@mairbek</a></p>
+					<p><a href="mailto:mkhadikov@gmail.com">mkhadikov@gmail.com</a></p>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
