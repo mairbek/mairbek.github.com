@@ -1,0 +1,33 @@
+---
+name: Programs Should be Small
+layout: post
+title: Programs Should be Small
+time: 2012-02-02 09:49:00 +02:00
+---
+
+<h3>Evolution of software matters</h3>
+<p>
+How big is a source code you are working on? How many developers do you have in the team? If you are going to add new feature tomorrow, how fast will you able to do so?
+</p>
+<p>
+Maintainability matters. Well, it matters in case if you're willing to build successful applications evolving through the years. And if you would like to be able to quickly add new features you want to see developers spending most of the time on writing code and hacking on new stuff.
+</p>
+<p>
+Working mostly on enterprise projects I used to see multi-developer teams working on a single gigantic piece of software, usually built with one particular technology. This happens to be inefficient and leads to unmaintainable code. Developer on such project is forced to spend most of his time on trying to understand the way current system works instead of adding concrete value. And I'm sorry, there is no value in reading pages of purely written legacy code. The only value programmer can add is new code.
+</p>
+
+<p>
+Another disaster is verification of produced code. The ability to get instantaneous feedback by executing a newly written code is an essential part of developer's productivity. Unfortunately running enterprise software usually is a real pain of having rare application servers and databases multiplied by everlasting startup time.
+</p>
+
+<h3>Programs has to be small</h3>
+<p>
+	The way of building things that keeps developers happy and productive is to increase program-to-developer ratio. Instead of having hordes of programmers working on one single codebase, split your system to a small programs that could be deployed independently. Beautiful reusable code should be extracted as a libraries and maintained independently. Open source that libraries if possible to get feedback from peers.
+</p>
+
+<p>
+	Writing small programs or services, if we talk about web apps, benefits in long term perspective. First of all it's easy to reason about small services. The key is to write services that do one thing, and do it well. It's easy to execute these services independently and see whether it works or not. For example for gmail you might extract service responsible for sending and receiving emails, you might have a separate service for spam filtering, separate service for storing e-mails, a service that can apply filters and a standalone web-app that communicates with these services. 
+</p>
+<p>
+	One big advantage of splitting you program is that restriction to use one particular platform disappears. We all know that ruby or node.js make you really productive in writing web apps but are pretty inefficient from performance perspective comparing to C++ or Java. Since we are able to deploy services independently we can combine different technologies and write web app with rails and backend services using C++ and use some convenient protocol like Protobuf or Apache Thrift for communication between them.
+</p>
