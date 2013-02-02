@@ -2,9 +2,15 @@
 layout: default
 ---
 <div class="post">
-  <h2>{{page.title}}<small> {{page.date | date: "%B %d, %Y" }}</small></h2>
+  <h2 style="display: inline;">{{page.title}}</h2>
   <div>
     {{ content }}
+    <blockquote>
+      <dl>
+        <dd>{{page.date | date: "%B %d, %Y" }}</dd>
+        <dd>{{page.location}}</dd>
+      </dl>
+    </blockquote>
 
     <div class="row">
       <!-- twitter -->
@@ -32,4 +38,5 @@ layout: default
       </div>
     </div>
   </div>
+
 </div>
