@@ -7,7 +7,7 @@ time: 2013-02-15 09:49:00 +02:00
 ---
 
 <p>
-	Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are some tasks that simply require at least decent amount of coordinating activity.
+	Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are some tasks that simply require at least decent amount of coordinating activity. Most articles I've read about coordination are either too academic or focused on a specific solution instead of the problem itself. In this article I would like to give a simple overview of coordination problems that are common for distributed systems.  
 </p>
 
 <p>
@@ -27,7 +27,7 @@ time: 2013-02-15 09:49:00 +02:00
 </p>
 
 <p>
-	Many popular distributed databases, search servers, file systems require single master node to coordinate activities across other nodes in some way. But how do you select the master? Obvious way to do this is to choose it by yourself. It will work but as we know already, predefined configuration is not that flexible. Plus, remember we are living in distributed world, we need master to be fault tolerant: in case if current master crashes some other node should come up and do the job. The problem of automatically select(elect) master(leader) process is called <b>leader election</b>. Technically speaking leader election is the same old <b>locking</b> problem. Think of leader as a process that acquired and holds lock forever until shut down or failed. But since it is frequently encountered it is considered separately.
+	Many popular distributed databases, search servers, file systems require single master node to coordinate activities across other nodes in some way. But how do you select the master? Obvious way to do this is to choose it by yourself. It works but as we already know, predefined configuration is not that flexible. Plus, remember we are living in distributed world, we need master to be fault tolerant: in case if current master crashes some other node should come up and do the job. The problem of automatically select(elect) master(leader) process is called <b>leader election</b>. Technically speaking leader election is the same old <b>locking</b> problem. Think of leader as a process that acquired and holds lock forever until shut down or failed. But since it is frequently encountered it is considered separately.
 </p>
 
 <p>
