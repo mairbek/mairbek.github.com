@@ -11,15 +11,15 @@ time: 2013-02-15 09:49:00 +02:00
 </p>
 
 <p>
-	So what do I mean by coordination? Let's start with the simple one. Common challenge in distributed systems is getting the <b>naming</b> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the solution that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.
+	So what do I mean by coordination? Let's start with the simple one. Common challenge in distributed systems is getting the <b>naming</b> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the 	 that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.
 </p>
 
 <p>
-	<b>Configuration management</b> is another coordination problem that pops out frequently. Every sophisticated system has to deal with the configuration information. Property files may sound great but imagine you have hundreds of nodes in the cluster running particular deployment packages and now you have to change the configuration property on all of this servers. It turns out that property files are great if configuration is static but using them for dynamic configuration doesn't seems to be good idea.
+	<b>Configuration management</b> is another coordination problem that pops out frequently. Every sophisticated system has to deal with the configuration information. Property files may sound great but consider you have hundreds of nodes in the cluster running particular deployment packages and now you have to change the configuration property on all of this servers. It turns out that property files are great if configuration is static but using them for dynamic configuration doesn't seems to be good idea.
 </p>
 
 <p>
-	To explain next problem named <b>group membership</b> let's picture some real world project. Imagine you are working on a social network web-site and there are two types of distributed processes: front-end servers that handles http requests and image servers responsible for efficient image storage. Whenever user uploads the photo, front-end server has to communicate with the image storage to save the image, so front-end server has to be configured to know the addresses of the image servers. Now imagine that photo sharing feature becomes extremely popular and we need to increase number of image servers in order to handle all content uploads. In addition let's be realistic and accept the fact that some of the servers might fail and we need to track that information and avoid sending requests to the failed server. Sounds non-trivial.
+	To explain next problem named <b>group membership</b> let's picture some real world project. Imagine you are working on a social network web-site and there are two types of distributed processes: front-end servers that handles http requests and image servers responsible for efficient image storage. Whenever user uploads the photo, front-end server has to communicate with the image storage to save the image, so front-end server has to be configured to know the addresses of the image servers. Now suddenly this photo sharing feature becomes extremely popular and we need to increase number of image servers in order to handle all content uploads. In addition let's be realistic and accept the fact that some of the servers might fail and we need to track that information and avoid sending requests to the failed server. Sounds non-trivial.
 </p>
 
 <p>
