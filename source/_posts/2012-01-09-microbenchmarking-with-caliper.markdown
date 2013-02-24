@@ -3,7 +3,7 @@ layout: post
 title: "Microbenchmarking with Caliper (Rus)"
 date: 2012-01-09 13:07
 comments: true
-categories: 
+categories: ["Caliper", "Java", "Microbenchmarking"]
 ---
 
 Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.
