@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Graph Search Architecture Overview"
-date: 2013-02-24 12:16
+date: 2013-02-16 12:16
 comments: true
 categories: ["Architecture", "Graph Search"]
 ---
