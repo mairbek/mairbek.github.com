@@ -1,0 +1,22 @@
+---
+layout: post
+title: "Coordination in Distributed Systems"
+date: 2013-02-15 12:12
+comments: true
+categories: Distributed Systems, Coordination, Apache ZooKeeper
+---
+
+Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for [shared nothing architecture](http://en.wikipedia.org/wiki/Shared_nothing_architecture) where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I've read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.
+
+So what do I mean by coordination? Let's start with the simple one. Common challenge in distributed systems is getting the *naming* right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.
+
+*Configuration management* is another coordination problem that pops out frequently. Every sophisticated system has to deal with the configuration information. Property files may sound great but consider you have hundreds of nodes in the cluster running particular deployment packages and now you have to change the configuration property on all of this servers. It turns out that property files are great if configuration is static but using them for dynamic configuration doesn't seems to be good idea.
+
+To explain next problem named *group membership* let's picture some real world project. Imagine you are working on a social network web-site and there are two types of distributed processes: front-end servers that handle http requests and image servers responsible for efficient image storage. Whenever user uploads the photo, front-end server has to communicate with the image storage to save the image, so front-end server has to be configured to know the addresses of the image servers. Now suddenly this photo sharing feature becomes extremely popular and we need to increase number of image servers in order to handle all content uploads. In addition let's be realistic and accept the fact that some of the servers might fail and we need to track that information and avoid sending requests to the failed server. Sounds non-trivial.
+
+If you worked on multi-threaded programs, apparently you should be familiar with the concurrency issues. While developing distributed app we basically face the same challenges as we would face in the multi-threaded environment plus. In the distributed system race conditions between the processes could easily happen if there are some shared resources, so you might be forced to implement some decent *locking* mechanism to solve them. Race condition is not the only issue, some of your data may require ACID guaranties (atomicity, consistency, integrity and durability) and you should be ready to get you hands dirty and implement transactions by yourself.
+
+Many popular distributed databases, search servers, file systems require single master node to coordinate activities across other nodes in some way. But how do you select the master? Obvious way to do this is to choose it by yourself. It works but as we already know, predefined configuration is not that flexible. Plus, remember we are living in distributed world, we need master to be fault tolerant: in case if current master crashes some other node should come up and do the job. The problem of automatically select(elect) master(leader) process is called *leader election*. Technically speaking leader election is the same old *locking* problem. Think of leader as a process that acquired and holds lock forever until shut down or failed. But since it is frequently encountered it is considered separately.
+
+Coordination problems I've described may sound easy but implementing them correctly in fault tolerant way may lead you to the nights of hardcore debugging of highly concurrent code. No fun, believe me, I've seen a project where custom distributed transactions are implemented. Fortunately, [Apache ZooKeeper](http://zookeeper.apache.org/) comes to rescue by providing set of reliable primitives, building blocks that allow us to tackle coordination problems with ease.
+
