@@ -3,7 +3,7 @@ layout: post
 title: "Graph Search Architecture Overview"
 date: 2013-02-24 12:16
 comments: true
-categories: Architecture
+categories: ["Architecture", "Graph Search"]
 ---
 
 Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I've attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his [resume][1].

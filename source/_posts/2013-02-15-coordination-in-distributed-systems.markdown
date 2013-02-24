@@ -3,7 +3,7 @@ layout: post
 title: "Coordination in Distributed Systems"
 date: 2013-02-15 12:12
 comments: true
-categories: Distributed Systems, Coordination, Apache ZooKeeper
+categories: ["Distributed Systems", Coordination, "Apache ZooKeeper"]
 ---
 
 Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for [shared nothing architecture](http://en.wikipedia.org/wiki/Shared_nothing_architecture) where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I've read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.

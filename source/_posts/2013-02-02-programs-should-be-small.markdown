@@ -3,7 +3,7 @@ layout: post
 title: "Programs Should be Small"
 date: 2013-02-02 12:03
 comments: true
-categories: Programming, Development 
+categories: Programming, Development, Architecture
 ---
 
 ## Evolution of software matters
