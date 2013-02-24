@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Tail Spin</title>
+  <title>To GWT or not to GWT (Rus) - Tail Spin</title>
   <meta name="author" content="Mairbek Khadikov">
 
   
-  <meta name="description" content="Mairbek Khadikov I&#8217;m a Software Engineer from Kharkiv, Ukraine. I&#8217;m interested in innovative projects, distributed computing, functional &hellip;">
+  <meta name="description" content="Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mairbek.github.com/index.html">
+  <link rel="canonical" href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -76,46 +76,117 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  <article>
-    <h2>Mairbek Khadikov</h2>
-    <img src="/images/khadikov.jpg" alt="Mairbek Khadikov"/>
-    <p>
-      I&#8217;m a Software Engineer from Kharkiv, Ukraine. I&#8217;m interested in innovative projects, distributed computing, functional programming, robotics, artificial intelligence and machine learning. Usually, I spend my time on writing code, skateboarding, reading and learning.
-    </p>
-  </article>
-  <article>
-  <h3>Recent Blog Posts</h3>
+  <header>
+    
+      <h1 class="entry-title">To GWT or Not to GWT (Rus)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
   
-    <h5 class="entry-title"><a href="/2013/02/16/graph-search-architecture-overview.html">Graph Search Architecture Overview</a></h5>
-  
-    <h5 class="entry-title"><a href="/2013/02/15/coordination-in-distributed-systems.html">Coordination in Distributed Systems</a></h5>
-  
-    <h5 class="entry-title"><a href="/2012/02/02/programs-should-be-small.html">Programs Should Be Small</a></h5>
-  
-    <h5 class="entry-title"><a href="/2012/01/21/logging-gotcha.html">Logging Gotcha (Rus)</a></h5>
-  
-    <h5 class="entry-title"><a href="/2012/01/09/microbenchmarking-with-caliper.html">Microbenchmarking With Caliper (Rus)</a></h5>
-  
-    <h5 class="entry-title"><a href="/2011/05/14/to-gwt-or-not-to-gwt.html">To GWT or Not to GWT (Rus)</a></h5>
-  
-    <h5 class="entry-title"><a href="/2011/05/11/zookeeper.html">ZooKeeper Intro (Rus)</a></h5>
-  
-    <h5 class="entry-title"><a href="/2011/04/03/automation.html">Не бойтесть автоматизировать</a></h5>
-  
-    <h5 class="entry-title"><a href="/2011/03/23/junit.html">Новинки JUnit. Категории.</a></h5>
-  
-  </article>
-  <article>
-    <h3>Presentations</h3>
-    <h5><a href="http://mkhadikov.com/talks/finagle/index.html?theme=simple">Asynchronous RPC with 
-Finagle</a> at DevTime (Kharkiv, Ukraine), 2013</h5>
-    <h5><a href="http://www.slideshare.net/mairbek/slides-10623424">Continuous Performance Testing</a> at XP Days (Kiev, Ukraine), 2012</h5>
-    <h5><a href="http://www.slideshare.net/mairbek/zookeeper-presentation">Coordination in Distributed Systems</a> at Dev-Time (Kharkov, Ukraine), 2012</h5>
-    <h5><a href="http://www.slideshare.net/mairbek/ss-7079843">Tips for Successful Web App Test Automation (Rus)</a> at Selenium Camp (Kiev, Ukraine), 2011</h5>
-  </article>
+
+
+<time datetime="2011-05-14T13:13:00+03:00" pubdate data-updated="true">May 14<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript&#8217;e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
+
+<p>В последнее время мне удалось поработать с GWT, итак за и против.</p>
+
+<h3>За GWT:</h3>
+
+<ol>
+<li>Не нужно учить <em>Javascript</em>. Если вы гуру и не одну собаку съели педаля на жабе и принципиально не хотите учить javascript, то gwt в самый раз.</li>
+<li>Все приимущества <em>Java</em>. Статическая типизация, IDE, дебаггер, рефакторинги, анализаторы кода &#8211; все к вашим услугам.</li>
+<li>Один код на сервере и на клиенте. Код написанный для сервера может быть скомпилирован в javascript и работать на клиенте.</li>
+<li>Google. GWT разрабатывается, не командой волосатых программистов из гаража, а корпорацией google и используется в проектах компании.</li>
+<li>Кросс-браузерность.Разрабатывая с помощью GWT можно не беспокоится про кросс-браузерность, клиент компилируется в поддерживаемый современными браузерами код.</li>
+</ol>
+
+
+<h3>Против GWT:</h3>
+
+<ol>
+<li>Java == No fun. Писать на жаве UI неудобно. Количество строк кода в результате &#8211; огромно.</li>
+<li>Медленно. Скорость разработки на GWT на порядок меньше чем с помощью javascript&#8217;a. В большинстве из-за количества кода, которое приходится писать. Скорость работы GWT-овского компилятора уничтожает желание использовать GWT.</li>
+<li>Отсутсвие подходов к написанию программ с помощью GWT. Best practices и подходы по написанию программ с помощью GWT постоянно меняются. RequestFactory и Activity Framework до сих пор сырые.</li>
+</ol>
+
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mairbek Khadikov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-14T13:13:00+03:00" pubdate data-updated="true">May 14<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/gwt/'>GWT</a>, <a class='category' href='/blog/categories/java/'>Java</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html" data-via="mairbek" data-counturl="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2011/05/11/zookeeper.html" title="Previous Post: ZooKeeper Intro (Rus)">&laquo; ZooKeeper Intro (Rus)</a>
+      
+      
+        <a class="basic-alignment right" href="/2012/01/09/microbenchmarking-with-caliper.html" title="Next Post: Microbenchmarking with Caliper (Rus)">Microbenchmarking with Caliper (Rus) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -148,7 +219,7 @@ Finagle</a> at DevTime (Kharkiv, Ukraine), 2013</h5>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/mairbek">@mairbek</a> on GitHub
@@ -178,7 +249,7 @@ Finagle</a> at DevTime (Kharkiv, Ukraine), 2013</h5>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -206,6 +277,7 @@ Finagle</a> at DevTime (Kharkiv, Ukraine), 2013</h5>
 
   
 </aside>
+
 
     </div>
   </div>

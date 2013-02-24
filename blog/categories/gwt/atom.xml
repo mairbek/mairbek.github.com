@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: GWT | Tail Spin]]></title>
+  <link href="http://mairbek.github.com/blog/categories/gwt/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-02-24T13:56:33+02:00</updated>
+  <id>http://mairbek.github.com/</id>
+  <author>
+    <name><![CDATA[Mairbek Khadikov]]></name>
+    <email><![CDATA[mkhadikov@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[To GWT or not to GWT (Rus)]]></title>
+    <link href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
+    <updated>2011-05-14T13:13:00+03:00</updated>
+    <id>http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt</id>
+    <content type="html"><![CDATA[<p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript'e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
+
+<p>В последнее время мне удалось поработать с GWT, итак за и против.</p>
+
+<h3>За GWT:</h3>
+
+<ol>
+<li>Не нужно учить <em>Javascript</em>. Если вы гуру и не одну собаку съели педаля на жабе и принципиально не хотите учить javascript, то gwt в самый раз.</li>
+<li>Все приимущества <em>Java</em>. Статическая типизация, IDE, дебаггер, рефакторинги, анализаторы кода -- все к вашим услугам.</li>
+<li>Один код на сервере и на клиенте. Код написанный для сервера может быть скомпилирован в javascript и работать на клиенте.</li>
+<li>Google. GWT разрабатывается, не командой волосатых программистов из гаража, а корпорацией google и используется в проектах компании.</li>
+<li>Кросс-браузерность.Разрабатывая с помощью GWT можно не беспокоится про кросс-браузерность, клиент компилируется в поддерживаемый современными браузерами код.</li>
+</ol>
+
+
+<h3>Против GWT:</h3>
+
+<ol>
+<li>Java == No fun. Писать на жаве UI неудобно. Количество строк кода в результате -- огромно.</li>
+<li>Медленно. Скорость разработки на GWT на порядок меньше чем с помощью javascript'a. В большинстве из-за количества кода, которое приходится писать. Скорость работы GWT-овского компилятора уничтожает желание использовать GWT.</li>
+<li>Отсутсвие подходов к написанию программ с помощью GWT. Best practices и подходы по написанию программ с помощью GWT постоянно меняются. RequestFactory и Activity Framework до сих пор сырые.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

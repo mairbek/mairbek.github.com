@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tail Spin]]></title>
+  <link href="http://mairbek.github.com/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-02-24T13:56:33+02:00</updated>
+  <id>http://mairbek.github.com/</id>
+  <author>
+    <name><![CDATA[Mairbek Khadikov]]></name>
+    <email><![CDATA[mkhadikov@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Graph Search Architecture Overview]]></title>
+    <link href="http://mairbek.github.com/2013/02/16/graph-search-architecture-overview.html"/>
+    <updated>2013-02-16T12:16:00+02:00</updated>
+    <id>http://mairbek.github.com/2013/02/16/graph-search-architecture-overview</id>
+    <content type="html"><![CDATA[<p>Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I&#8217;ve attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his <a href="http://en.wikipedia.org/wiki/Lars_Rasmussen_(software_developer)" title="Lars Rasmussen">resume</a>.</p>
+
+<p>Now <a href="http://incubator.apache.org/wave/" title="Apache Wave">Wave is dead</a>, Lars works for <a href="http://facebook.com/" title="Facebook">Facebook</a>, and they&#8217;ve recently announced <a href="https://www.facebook.com/about/graphsearch" title="Graph Search">graph search</a>, a technology that allows you to search anything shared with you on Facebook. I&#8217;ve been interested in the technical details for a while and lately I&#8217;ve found Lars <a href="http://www.reddit.com/r/IAmA/comments/18jb6d/i_am_the_pointyhaired_engineering_director_for/" title="Answers on reddit">answering questions on Reddit</a>. So for those who are lazy to read whole Q/As I&#8217;ve written a quick summary of graph search architecture quoting author as much as possible.</p>
+
+<p>At the back-end they have inverted-index system called <em>Unicorn</em> that is used to select nodes in the social graph based on edge-relationships to other nodes. <em>Unicorn</em> is akin to document search systems for other contexts like email, webpages, or files on your computer; but it also has some graph-centric features that make it especially useful for searching over the social graph.</p>
+
+<p>All the search requests from users are sent to the index servers. <em>Hive</em>, <em>Hadoop</em>, and <em>HBase</em> are used to convert database contents into an inverted index on a regular basis, and then they push messages to index servers to have realtime updates from the base index.</p>
+
+<p>When a user fires a search request the query gets translated two times. First NLP translator transforms natural language query to a semantic language that describes the interpretation of the natural language, and then further down in the stack they use an <em>s-expression</em> syntax to retrieve potential results from an inverted index.</p>
+
+<p>Lars gave the following example. When user types</p>
+
+<blockquote><p>My friends who live in Sydney, Australia</p></blockquote>
+
+<p>it is interpreted to semantical form of</p>
+
+<blockquote><p>intersect(friends(me), residents(110884905606108))</p></blockquote>
+
+<p>and then to s-expression</p>
+
+<blockquote><p>(and friend:767560056 city_to_user:110884905606108)</p></blockquote>
+
+<p>If you have tried graph search you may noticed that you can&#8217;t use a random query to search stuff, when you start typing system automatically suggests you matched queries and you can fire only suggested ones. How does it work? At the core of the system sits a <a href="http://en.wikipedia.org/wiki/Context-free_grammar" title="Context-Free Grammar">Context-Free Grammar</a> describing all the queries the system can understand. The grammar in general contains many different ways of expressing the same question. As a user types in the search field, a <a href="http://en.wikipedia.org/wiki/Parsing" title="Parsing">Parser</a> attempts to find the queries from the grammar that most closely matches what the user has typed, and displays those as suggestions in a drop-down below the search field.</p>
+
+<p>As part of the parser they&#8217;ve developed <a href="http://en.wikipedia.org/wiki/Named-entity_recognition" title="Named Entity Recognition">named entity recognition engine</a>. For example, if you search for photos of <em>jane doe</em> the parser will figure out which Jane Doe you are looking for. When in doubt, they tend of course to pick the Jane who has the most friends in common with you.</p>
+
+<p>Graph search is an exciting piece of technology as mush as Wave was, and it definitely pushed industry forward. I hope you&#8217;ve find my notes interesting, and by the way I guess Lars is still answering the questions!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Coordination in Distributed Systems]]></title>
+    <link href="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html"/>
+    <updated>2013-02-15T12:12:00+02:00</updated>
+    <id>http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems</id>
+    <content type="html"><![CDATA[<p>Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I&#8217;ve read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.</p>
+
+<p>So what do I mean by coordination? Let&#8217;s start with the simple one. Common challenge in distributed systems is getting the <em>naming</em> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.</p>
+
+<p><em>Configuration management</em> is another coordination problem that pops out frequently. Every sophisticated system has to deal with the configuration information. Property files may sound great but consider you have hundreds of nodes in the cluster running particular deployment packages and now you have to change the configuration property on all of this servers. It turns out that property files are great if configuration is static but using them for dynamic configuration doesn&#8217;t seems to be good idea.</p>
+
+<p>To explain next problem named <em>group membership</em> let&#8217;s picture some real world project. Imagine you are working on a social network web-site and there are two types of distributed processes: front-end servers that handle http requests and image servers responsible for efficient image storage. Whenever user uploads the photo, front-end server has to communicate with the image storage to save the image, so front-end server has to be configured to know the addresses of the image servers. Now suddenly this photo sharing feature becomes extremely popular and we need to increase number of image servers in order to handle all content uploads. In addition let&#8217;s be realistic and accept the fact that some of the servers might fail and we need to track that information and avoid sending requests to the failed server. Sounds non-trivial.</p>
+
+<p>If you worked on multi-threaded programs, apparently you should be familiar with the concurrency issues. While developing distributed app we basically face the same challenges as we would face in the multi-threaded environment plus. In the distributed system race conditions between the processes could easily happen if there are some shared resources, so you might be forced to implement some decent <em>locking</em> mechanism to solve them. Race condition is not the only issue, some of your data may require ACID guaranties (atomicity, consistency, integrity and durability) and you should be ready to get you hands dirty and implement transactions by yourself.</p>
+
+<p>Many popular distributed databases, search servers, file systems require single master node to coordinate activities across other nodes in some way. But how do you select the master? Obvious way to do this is to choose it by yourself. It works but as we already know, predefined configuration is not that flexible. Plus, remember we are living in distributed world, we need master to be fault tolerant: in case if current master crashes some other node should come up and do the job. The problem of automatically select(elect) master(leader) process is called <em>leader election</em>. Technically speaking leader election is the same old <em>locking</em> problem. Think of leader as a process that acquired and holds lock forever until shut down or failed. But since it is frequently encountered it is considered separately.</p>
+
+<p>Coordination problems I&#8217;ve described may sound easy but implementing them correctly in fault tolerant way may lead you to the nights of hardcore debugging of highly concurrent code. No fun, believe me, I&#8217;ve seen a project where custom distributed transactions are implemented. Fortunately, <a href="http://zookeeper.apache.org/">Apache ZooKeeper</a> comes to rescue by providing set of reliable primitives, building blocks that allow us to tackle coordination problems with ease.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Programs Should be Small]]></title>
+    <link href="http://mairbek.github.com/2012/02/02/programs-should-be-small.html"/>
+    <updated>2012-02-02T12:03:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/02/02/programs-should-be-small</id>
+    <content type="html"><![CDATA[<h2>Evolution of software matters</h2>
+
+<p>How big is the source code you are working on? How many developers do you have in your team? If you are going to add new feature tomorrow, how fast will you be able to do that?</p>
+
+<p>Maintainability matters. Well, it matters in case if you&#8217;re willing to build a successful applications evolving over the years. And if you would like to be able to quickly add new features you definitely want to see the developers spending most of the time on writing code and hacking on a new stuff.</p>
+
+<p>Working mostly on enterprise projects I used to see multi-developer teams working on a single gigantic piece of software, usually built using one particular technology. This turns out to be inefficient and leads to unmaintainable code. A developer on a such project is forced to spend most of his time on trying to understand the way the current system works instead of adding concrete value. And I&#8217;m sorry, there is no value in reading pages of purely written legacy code. The only real value programmer can add is a new code.</p>
+
+<p>Another disaster is the verification of the produced code. Getting instantaneous feedback by executing a newly written code is the essential part of the developer&#8217;s productivity. Unfortunately running enterprise software is usually a real pain. You are forced to use rare application servers, monstrous databases, and in addition you have huge codebase with everlasting build time.</p>
+
+<h2>Decomposition for the win</h2>
+
+<p>Increasing program-to-developer ratio is the way of building things that keeps the developers productive and happy. Instead of having hordes of programmers working on one single codebase, split your system to a small programs that could be deployed independently. Beautiful reusable code should be extracted as a libraries and be maintained independently. <a href="http://tom.preston-werner.com/2011/11/22/open-source-everything.html">Open source that libraries</a> if possible and you&#8217;ll get the feedback from the peers.</p>
+
+<p>Writing small programs or services, if we talk about web apps, benefits in long term perspective. First of all small services are easy to reason about. The key is to stick with <a href="http://en.wikipedia.org/wiki/Open/closed_principle">open closed principle</a>, write services that do one thing, and do it well. It&#8217;s easy to execute these services independently and see whether they work or not. For example for Gmail you might extract a service responsible for sending and receiving emails, you might have a separate service that does spam filtering, separate service for storing e-mails, a service that can apply filters and a standalone web-app that communicates with these services.</p>
+
+<p>One big advantage of splitting you program is that you are no longer restricted to use one particular platform. We know that <em>ruby</em> or <em>node.js</em> make you really productive in writing web apps but their performance is pretty inefficient comparing to <em>C++</em> or <em>Java</em>. Since we are able to deploy services independently we can forget about monolithic <em>Java EE</em> and combine different technologies and for example build a web app with <em>rails</em> and backend services using <em>C++</em> and use some convenient protocol like <a href="http://code.google.com/p/protobuf/">Protobuf</a> or <a href="http://thrift.apache.org/">Apache Thrift</a> for communication.</p>
+
+<p>Truth been told decomposition of the system is somewhat non-trivial. One thing is becoming obvious, well known layered architecture is going to ruin maintainability of your project. It&#8217;s tempting to stick with classical enterprise approach and create a service for accessing the database, service that encapsulates caching, service that does business logic and a presentation service. But features are cross-cutted usually through these layers. So any new sophisticated feature will require changes in every layer. In addition most of the code will be responsible for converting messages from one format to another.</p>
+
+<p>Software design and development is a pretty sophisticated activity and doesn&#8217;t fully depend on how smart you are and how many books you&#8217;ve read. It&#8217;s just so many thing you have to care about in order to achieve good quality solution. Keeping programs small is a great simple tool that allows you to reduce complexity of the solution and results in clean design and improved developers productivity.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Logging Gotcha (Rus)]]></title>
+    <link href="http://mairbek.github.com/2012/01/21/logging-gotcha.html"/>
+    <updated>2012-01-21T13:02:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/01/21/logging-gotcha</id>
+    <content type="html"><![CDATA[<p>Любое мало-мальски уважающее себя приложение не обходится без логгирования. Конечно, ведь иначе работа аппликухи в продакшне превращается в черный ящик.</p>
+
+<p>Современные библиотеки позволяют сохранять информацию на различных уровнях логгирования. В проектах, в которых я участвовал, обычно используется четыре уровня логгирования:</p>
+
+<ul>
+<li>ERROR &#8211; сюда выводится информация о критичных ошибках в системе.</li>
+<li>WARN &#8211; используется для вывода не критичных, но все же некорректных сиптомов неправльной работы приложения</li>
+<li>INFO &#8211; используется для вывода интересных событий происходлящих в системе</li>
+<li>DEBUG &#8211; детальныая информация о том, что происходит с системой. обычно используется при разработке либо при отладке.</li>
+</ul>
+
+
+<p>Обычно запись в лог выглядит довольно просто:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">&quot;SOMETHING REALLY BAD HAPPENED&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&quot;Something bad happened&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;Startup&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&quot;Processing request&quot;</span> <span class="o">+</span> <span class="n">request</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Уровни логгирования легко конфигурируются, так что мы можем наблюдать debug информацию при разработке и видеть чистый лог в продакшне.</p>
+
+<p>До сих пор, строки кода в open source библиотеках вида:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">log</span><span class="o">.</span><span class="na">isDebugEnabled</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&quot;Processing request&quot;</span> <span class="o">+</span> <span class="n">request</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>вызывали недоумения: зачем это нужно, ведь запись в лог будет лишь при включенном дебаге, соответсвенно проверка влюченности дебага попахивает излишеством.</p>
+
+<p>Однако, недавно я обнаружил, что подход без использования проверки влюченности уровня логгирования несет недостатки о которых мне раньше не приходилось задумываться.</p>
+
+<p>Очень часто во время вывода в <em>debug</em> строки конкатенируются. И конкатенируются они независимо от того влючен дебаг или нет. Это во-первых приводит к тому, что создаются лишние строки что приводит к большим вызовам GC.</p>
+
+<p>Во-вторых, операция <em>toString</em> может занимать продолжительное количество времени, и как показала недавняя история до 15% времени тормозящего метода.</p>
+
+<p>Получается писать проверку влюченности уровня необходимо. Но не удобно. Количество строчек кода для записи в лог увеличивается в три раза.</p>
+
+<p>Однако, если в проекте используется библиотека логирования <em>slf4j</em>, можно обойтись малой кровью используя шаблоны в строках. Как это работает:</p>
+
+<p>Вместо конкатенации строк при логировании</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&quot;Processed request &quot;</span> <span class="o">+</span> <span class="n">request</span> <span class="o">+</span> <span class="s">&quot; sending response &quot;</span> <span class="o">+</span> <span class="n">response</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>писать</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">&quot;Processed request {} sending response {}&quot;</span><span class="o">,</span> <span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <updated>2012-01-09T13:07:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
+
+<p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>
+
+<p>Такая инженерная практика именуется <em>microbenchmarking</em>. Суть микробенчмаркинга в измерении производительности (загрузки процессора, памяти или операций с сетью, диском) небольших кусков кода для того, чтобы понять какой код лучше подходит для текущего сценария.</p>
+
+<p>Стоит заметить, что микробенчмаркинг и профайлинг &#8211; это не одно и то же. Различия между ними напоминают различия между unit тестированием и интеграционным тестированием. Профайлинг подразумевает исследование производительности всего приложения в целом, тогда как микробенчмаркинг &#8211; это, в свою очередь, исследование актуальной в данный момент функциональности.</p>
+
+<p>Зная что нужно измерять, написать бенчмарк довольно тривиально, и, часто, вполне можно обойтись одним единственным статическим методом main. Однако, используя фреймверк Caliper от компании Google, бенчмарки можно писать быстро и с удовольствием, выкинув при этом кучу boilerplate кода.</p>
+
+<p>API Caliper в чем то напоминает старую версию JUnit. Для того чтобы написать простой бенчмарк нужно:</p>
+
+<ol>
+<li>Отнаследоваться от класса com.google.caliper.SimpleBenchmark</li>
+<li>Написать тестовые методы, название которых начинается со слова time.</li>
+<li>Подготовка данных и очистка ресурсов происходит в методах setUp и tearDown соответственно.</li>
+</ol>
+
+
+<p>Caliper изначально поставляется с большим количеством примеров. Один из интересных <em>LoopingBackwardsBenchmark</em>, который сравнивает скорость итерирования вперед и назад.</p>
+
+<figure class='code'><figcaption><span>LoopingBackwardsBenchmark</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">LoopingBackwardsBenchmark</span> <span class="kd">extends</span> <span class="n">SimpleBenchmark</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Param</span><span class="o">({</span><span class="s">&quot;2&quot;</span><span class="o">,</span> <span class="s">&quot;20&quot;</span><span class="o">,</span> <span class="s">&quot;2000&quot;</span><span class="o">,</span> <span class="s">&quot;2000000&quot;</span><span class="o">,</span> <span class="s">&quot;20000000&quot;</span><span class="o">,</span> <span class="s">&quot;200000000&quot;</span><span class="o">})</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">int</span> <span class="n">max</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">timeForwards</span><span class="o">(</span><span class="kt">int</span> <span class="n">reps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">dummy</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">reps</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">max</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">dummy</span> <span class="o">+=</span> <span class="n">j</span><span class="o">;</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">dummy</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">timeBackwards</span><span class="o">(</span><span class="kt">int</span> <span class="n">reps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">dummy</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">reps</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">max</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">j</span><span class="o">--)</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">dummy</span> <span class="o">+=</span> <span class="n">j</span><span class="o">;</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">dummy</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Runner</span><span class="o">.</span><span class="na">main</span><span class="o">(</span><span class="n">LoopingBackwardsBenchmark</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">args</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Запустив тест мы убедимся, что разницы в производительности нет.</p>
+
+<p>Еще один пример. Допустим, мы разрабатываем функциональность которая предполагает огромное количество операций над дробными числами, и мы думаем стоит ли использовать BigDecimal или лучше остановить свой выбор на старом добром быстром double. Сравнить насколько медленней будет работать BigDecimal для такой операции как умножение не сложно.</p>
+
+<figure class='code'><figcaption><span>&#8220;Double Vs BigDecimal&#8221;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DoubleVsBigDecimalBenchmark</span> <span class="kd">extends</span> <span class="n">SimpleBenchmark</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Param</span><span class="o">({</span><span class="s">&quot;1&quot;</span><span class="o">,</span> <span class="s">&quot;1.01&quot;</span><span class="o">,</span> <span class="s">&quot;1.0123456789&quot;</span><span class="o">,</span> <span class="s">&quot;20&quot;</span><span class="o">,</span> <span class="s">&quot;20.01&quot;</span><span class="o">,</span> <span class="s">&quot;20.0123456789&quot;</span><span class="o">,</span> <span class="s">&quot;1000000000&quot;</span><span class="o">,</span> <span class="s">&quot;1000000000.01&quot;</span><span class="o">,</span> <span class="s">&quot;1000000000.0123456789&quot;</span><span class="o">})</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">double</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">BigDecimal</span><span class="o">[]</span> <span class="n">bigDecimalVal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">double</span><span class="o">[]</span> <span class="n">doubleVal</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">double</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">setUp</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">bigDecimalVal</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">doubleVal</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">timeDouble</span><span class="o">(</span><span class="kt">int</span> <span class="n">reps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kt">double</span> <span class="n">dummy</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">reps</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">v</span> <span class="o">=</span> <span class="n">i</span> <span class="o">/</span> <span class="o">(</span><span class="n">reps</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">dummy</span> <span class="o">=</span> <span class="n">doubleVal</span><span class="o">[</span><span class="n">v</span><span class="o">]</span> <span class="o">*</span> <span class="n">doubleVal</span><span class="o">[</span><span class="n">v</span><span class="o">];</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">doubleVal</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">timeBigDecimal</span><span class="o">(</span><span class="kt">int</span> <span class="n">reps</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">BigDecimal</span> <span class="n">dummy</span> <span class="o">=</span> <span class="n">BigDecimal</span><span class="o">.</span><span class="na">ZERO</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">reps</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="kt">int</span> <span class="n">v</span> <span class="o">=</span> <span class="n">i</span> <span class="o">/</span> <span class="o">(</span><span class="n">reps</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+</span><span class='line'>            <span class="n">dummy</span> <span class="o">=</span> <span class="n">bigDecimalVal</span><span class="o">[</span><span class="n">v</span><span class="o">].</span><span class="na">multiply</span><span class="o">(</span><span class="n">bigDecimalVal</span><span class="o">[</span><span class="n">v</span><span class="o">]);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">bigDecimalVal</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">dummy</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Runner</span><span class="o">.</span><span class="na">main</span><span class="o">(</span><span class="n">DoubleVsBigDecimalBenchmark</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="k">new</span> <span class="n">String</span><span class="o">[]{});</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Прогнав тест, становится видно, что для небольших чисел и чисел с небольшой дробной частью <em>BigDecimal</em> работает в 5 раз медленней, а для больших чисел либо чисел с большим количеством символов после запятой в 20 раз.</p>
+
+<p>Следует заметить, что JVM хитрая штука, и постоянно занимается оптимизацией кода, что сказывается на результатах бенчмарка, по-этому иногда надо выкручиваться. Например, в бенчмарке <em>DoubleVsBigDecimalBenchmark</em> используется массив и странный способ инициализации переменной <em>v</em> нулем.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[To GWT or not to GWT (Rus)]]></title>
+    <link href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
+    <updated>2011-05-14T13:13:00+03:00</updated>
+    <id>http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt</id>
+    <content type="html"><![CDATA[<p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript&#8217;e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
+
+<p>В последнее время мне удалось поработать с GWT, итак за и против.</p>
+
+<h3>За GWT:</h3>
+
+<ol>
+<li>Не нужно учить <em>Javascript</em>. Если вы гуру и не одну собаку съели педаля на жабе и принципиально не хотите учить javascript, то gwt в самый раз.</li>
+<li>Все приимущества <em>Java</em>. Статическая типизация, IDE, дебаггер, рефакторинги, анализаторы кода &#8211; все к вашим услугам.</li>
+<li>Один код на сервере и на клиенте. Код написанный для сервера может быть скомпилирован в javascript и работать на клиенте.</li>
+<li>Google. GWT разрабатывается, не командой волосатых программистов из гаража, а корпорацией google и используется в проектах компании.</li>
+<li>Кросс-браузерность.Разрабатывая с помощью GWT можно не беспокоится про кросс-браузерность, клиент компилируется в поддерживаемый современными браузерами код.</li>
+</ol>
+
+
+<h3>Против GWT:</h3>
+
+<ol>
+<li>Java == No fun. Писать на жаве UI неудобно. Количество строк кода в результате &#8211; огромно.</li>
+<li>Медленно. Скорость разработки на GWT на порядок меньше чем с помощью javascript&#8217;a. В большинстве из-за количества кода, которое приходится писать. Скорость работы GWT-овского компилятора уничтожает желание использовать GWT.</li>
+<li>Отсутсвие подходов к написанию программ с помощью GWT. Best practices и подходы по написанию программ с помощью GWT постоянно меняются. RequestFactory и Activity Framework до сих пор сырые.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ZooKeeper Intro (Rus)]]></title>
+    <link href="http://mairbek.github.com/2011/05/11/zookeeper.html"/>
+    <updated>2011-05-11T13:16:00+03:00</updated>
+    <id>http://mairbek.github.com/2011/05/11/zookeeper</id>
+    <content type="html"><![CDATA[<p>Любое распределенное приложение не может обойтись без центрального сервиса, который координирует процессы в нем. Реализовывать координацию можно, однако разработка отказоустйчивой системы координации без deadlock&#8217;ов и race conditions &#8211; задача не из тривиальных. Проект <em>Apache ZooKeeper</em> призван избавить нас от решения этой проблемы.</p>
+
+<p><em>ZooKeeper</em> &#8211; это распределенный, open-source сервис координнации для расспределенных приложений. Он предоставляет низкоуровневый API, с помощью которого приложения могут реализовать высокоуровневые сервисы для координации и синхронизации процессов в расспредеелнной системе.</p>
+
+<p>API ZooKeeper&#8217;a черезвычайно прост. Распределенные процессы могут координироваться между собой с помощью расшаренной на всех клиентов иерархии znode&#8217;ов, организация которых по структуре похожа на файловую систему. Как и в файловой системе каждый znode идентифицируется своим уникальным путем, вида <code>/node1/stuff/logs</code>. В отличии от привычной файловой системы, каждый znode может быть корневым узлом для других znode&#8217;ов. Если говорить в терминах файловой системы: файл может выступать в роли директории. Znode&#8217;ы версионируются и ZooKeeper позволяет &#8220;смотреть&#8221;(watch) за изменениями в ноде. Как только znode&#8217;a изменяется, клиент, смотрящий за нодой, получает пакет, который говорит что в ноде произошло измение.</p>
+
+<p>ZooKeeper реплицируемый и обрабатывает команды в строгой последовательности. Первое намного повышает его надежность, второе дает возможность пользователям разрабатывать примитивы синхронизации для распределенных систем. Все данные ZooKeeper держит в памяти, что позволяет ему работать черезвычайно быстро. Разработчики дауют нам следующие гарантии:</p>
+
+<ul>
+<li><em>Sequential Consistency</em> &#8211; Обновления от клиента будут применены в порядке в котором они были отправены</li>
+<li><em>Atomicity</em> &#8211; Изменения от клиента атомарны, они либо исполняются либо нет</li>
+<li><em>Single System Image</em> &#8211; Клиент получет одинаковый набор znode&#8217;ов вне зависимости от того к какому серверу он подключен</li>
+<li><em>Reliability</em> &#8211; Как только измение было применено, состояние будет неизменно до тех пор пока клиент не перетрет его</li>
+<li><em>Timeliness</em> &#8211; Состояние системы для клиент гарантированно up-to-date с некоторой погрешностью по времени</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Не бойтесть автоматизировать]]></title>
+    <link href="http://mairbek.github.com/2011/04/03/automation.html"/>
+    <updated>2011-04-03T13:21:00+03:00</updated>
+    <id>http://mairbek.github.com/2011/04/03/automation</id>
+    <content type="html"><![CDATA[<p>Использование автоматизированных тестов на <a href="http://seleniumhq.org/" title="Selenium">selenium</a> в качестве приемочных тестов становится распространненой тенденцией в индустрии разработки программного обеспечения. Об этом свидельствует успех прошедшей недавно конференции <a href="http://seleniumcamp.com/" title="Selenium Camp">Selenium Camp</a>, на которой Ваш покорный слуга выступал докладчиком. Отчасти этому способствует активная пропоганда от agile сообщества, отчасти наличием success stories от гигантов индустрии, таких как, например, <a href="http://google.com/" title="Google">Google</a>, который является главным конрибьютером в новую, вторую, версию селениума.</p>
+
+<p>Однако, нужны ли нам автоматизированные тесты, если у нас в команде есть группа тестировщиков или QA-инженеров, способных обеспечить качество проекта на должном уровне? Я считаю, что автоматизированные тесты дополняют QA-инжеров, избавляя их от ненужной рутинной работы. Зачем тратить время на регрессию, если ее может сделать за тебя компьютер?</p>
+
+<p>К тому же тесты гарантируют, что ошибка не повторится вновь, а если и повторится, команда узнает о ней в скором времени. При этом разрабочики могут безболезненно вносить изменения в существующий код и добавлять новые фичи, зная что поломка может быть выявлена на этапе разработки. В то же время QA-инженер может занятся более интересными вещами, такими как usability, security тестирование, и поиск хитрых, заковыристых багов.</p>
+
+<p>Однако у тестов есть свои недостатки. Прежде всего, их нужно кому-то писать. Т.е. если у нас в команде нет людей, знакомых с автоматизацией, то нужно либо дать им возможность ошибаться и научиться, либо искать экспертов на стороне. Так же тесты требуют настройки инфраструктуры. Настройка билд конфигурации, развертывание серверов для запуска тестов и параллельный запуск тестов могут оказаться нетривиальными и потребовать времени и усилий.</p>
+
+<p>Нужно понимать, что тесты, как и любой код другой код требуют поддержки. Если у нас в приложении изменилась функциональность, то в тесты на эту функциональность придется вносить изменения, а возможно даже и переписывать.</p>
+
+<p>Несмотря на недостатки тестов, если удастся взрастить команду, которая может успешно автоматизировать приемочное тестирование, это будет выгодно всем. Бизнес получает более качественный продукт в меньшие сроки, сотрудники же занимаются интересными вещами, траятя свое время эффективно.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Новинки JUnit. Категории.]]></title>
+    <link href="http://mairbek.github.com/2011/03/23/junit.html"/>
+    <updated>2011-03-23T13:25:00+02:00</updated>
+    <id>http://mairbek.github.com/2011/03/23/junit</id>
+    <content type="html"><![CDATA[<p>В последнее время во всех проектах где я принимаю участие не обходится без автоматизированного тестирования. Везде есть unit тесты, плюс разработку часто сопровождают попытки покрыть код тестами на <em>Selenium</em>.</p>
+
+<p>Первый вопрос который стоит перед командой при написании автоматизированных тестов &#8211; как мы будем запускать тесты? Точнее &#8211; какой фреймворк для тестирования нам выбрать? Если мы программируем на <em>Java</em>, выбор не велик. <em>JUnit</em> или <em>TestNG</em>.</p>
+
+<p>Помню, когда мы начинали заниматься функциональными тестами на нашем последнем проекте, мы долго решали что же выбрать. Победил TestNG. Легкость создания test suit&#8217;a, возможность группировать тесты и запускать их параллельно &#8211; вот что определило наш выбор. В тот момент я подписался на интересные блоги и рассылки связанные с тестированием, и через некоторое время обнаружил, что JUnit активно развивается и догоняет TestNG по функциональности, при этом превосходит его в продуманности API.</p>
+
+<p>Так, в JUnit начиная с версии 4.8 появился механизм для метки и группировки тестов, под названием Categories.</p>
+
+<p>Процесс группировки тестов в JUnit до появления категорий можно стравнить с организацией писем в Microsoft Outlook. Мы можем группировать тест методы в классы, а классы в пакеты.</p>
+
+<p>Теперь, с помощью категорий, группировка тестов похожа на группировку писем в GMail.</p>
+
+<p>Представляются категории в виде java интерфейсов, что дает приемущества по сравнению с группами в TestNG. В отличии от строковых констант коими являются группы, мы можем переименовывать категории в IDE, плюс есть возможность построить йерархии категорий, что дает нам гибкость в организации тестов.</p>
+
+<p>Предположим, что у нас есть 4 категории: SmokeTest говорит что наш тест - смоук тест, <code>BrokenTest</code> показывает, что тест тестирует поломанный функционал, а с помощью <code>FastTest</code> и <code>SlowTest</code> мы помечаем тесты по времени выполнения.</p>
+
+<figure class='code'><figcaption><span>Categories</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">SmokeTest</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">BrokenTest</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">FastTest</span> <span class="o">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">SlowTest</span> <span class="o">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Допустим у нас есть два тест класса с помеченными методами:</p>
+
+<figure class='code'><figcaption><span>Some Smoke Test</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Category</span><span class="o">(</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeSmokeTests</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="nd">@Category</span><span class="o">(</span><span class="n">FastTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someFastTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// test something</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="nd">@Category</span><span class="o">(</span><span class="n">SlowTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someReallySlowTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// test something</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Some Test Case</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeTestCase</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="nd">@Category</span><span class="o">({</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">FastTest</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">fastSmokeTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// test something</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="nd">@Category</span><span class="o">({</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">FastTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">BrokenTest</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">fastBrokenSmokeTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// test something</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="nd">@Category</span><span class="o">({</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">SlowTest</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">slowSmokeTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// test something</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>С помощью категорий мы можем построить test suite, который будет запускать быстрые smoke тесты с работающим функционалом:</p>
+
+<figure class='code'><figcaption><span>Test Suite</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">Categories</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@IncludeCategory</span><span class="o">(</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">FastTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@ExcludeCategory</span><span class="o">(</span><span class="n">BrokenTest</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@SuiteClasses</span><span class="o">(</span><span class="n">SomeSmokeTests</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">SomeTestCase</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RunFastSmokeTestCases</span> <span class="o">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Правда, с увеличением количества классов в suite, конфигурация получаеться громоздкой, а куча аннотаций никак не добавляет читабельности коду.</p>
+
+<p>К счастью эта проблема решается с помощью библиотеки [junit-suite-configurator][1]. Так выглядит конфигурация эта же конфигурация написанная с ее помощью:</p>
+
+<figure class='code'><figcaption><span>junit-suite-configurator</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">Suite</span><span class="o">.</span><span class="na">Configuration</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Suite</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Configuration</span> <span class="kd">extends</span> <span class="n">AbstractConfiguration</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Configuration</span><span class="o">(</span><span class="n">Class</span> <span class="n">testClass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">super</span><span class="o">(</span><span class="n">testClass</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">run</span><span class="o">(</span><span class="n">classes</span><span class="o">(</span><span class="n">SomeSmokeTests</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">SomeTestCase</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">includeCategories</span><span class="o">(</span><span class="n">SmokeTest</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">FastTest</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">excludeCategories</span><span class="o">(</span><span class="n">BrokenTest</span><span class="o">.</span><span class="na">class</span><span class="o">))</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">applyRule</span><span class="o">(</span><span class="k">new</span> <span class="n">Rule1</span><span class="o">())</span>
+</span><span class='line'>    <span class="o">).</span><span class="na">invokeIn</span><span class="o">(</span><span class="n">singleThread</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+</feed>

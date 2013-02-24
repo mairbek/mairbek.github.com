@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Java | Tail Spin]]></title>
+  <link href="http://mairbek.github.com/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-02-24T13:56:33+02:00</updated>
+  <id>http://mairbek.github.com/</id>
+  <author>
+    <name><![CDATA[Mairbek Khadikov]]></name>
+    <email><![CDATA[mkhadikov@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Logging Gotcha (Rus)]]></title>
+    <link href="http://mairbek.github.com/2012/01/21/logging-gotcha.html"/>
+    <updated>2012-01-21T13:02:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/01/21/logging-gotcha</id>
+    <content type="html"><![CDATA[<p>Любое мало-мальски уважающее себя приложение не обходится без логгирования. Конечно, ведь иначе работа аппликухи в продакшне превращается в черный ящик.</p>
+
+<p>Современные библиотеки позволяют сохранять информацию на различных уровнях логгирования. В проектах, в которых я участвовал, обычно используется четыре уровня логгирования:</p>
+
+<ul>
+<li>ERROR -- сюда выводится информация о критичных ошибках в системе.</li>
+<li>WARN -- используется для вывода не критичных, но все же некорректных сиптомов неправльной работы приложения</li>
+<li>INFO -- используется для вывода интересных событий происходлящих в системе</li>
+<li>DEBUG -- детальныая информация о том, что происходит с системой. обычно используется при разработке либо при отладке.</li>
+</ul>
+
+
+<p>Обычно запись в лог выглядит довольно просто:</p>
+
+<p><code>java
+log.error("SOMETHING REALLY BAD HAPPENED")
+log.warn("Something bad happened")
+log.info("Startup")
+log.debug("Processing request" + request)
+</code></p>
+
+<p>Уровни логгирования легко конфигурируются, так что мы можем наблюдать debug информацию при разработке и видеть чистый лог в продакшне.</p>
+
+<p>До сих пор, строки кода в open source библиотеках вида:</p>
+
+<p>``` java
+if (log.isDebugEnabled()) {</p>
+
+<pre><code>log.debug("Processing request" + request);
+</code></pre>
+
+<p>}
+```</p>
+
+<p>вызывали недоумения: зачем это нужно, ведь запись в лог будет лишь при включенном дебаге, соответсвенно проверка влюченности дебага попахивает излишеством.</p>
+
+<p>Однако, недавно я обнаружил, что подход без использования проверки влюченности уровня логгирования несет недостатки о которых мне раньше не приходилось задумываться.</p>
+
+<p>Очень часто во время вывода в <em>debug</em> строки конкатенируются. И конкатенируются они независимо от того влючен дебаг или нет. Это во-первых приводит к тому, что создаются лишние строки что приводит к большим вызовам GC.</p>
+
+<p>Во-вторых, операция <em>toString</em> может занимать продолжительное количество времени, и как показала недавняя история до 15% времени тормозящего метода.</p>
+
+<p>Получается писать проверку влюченности уровня необходимо. Но не удобно. Количество строчек кода для записи в лог увеличивается в три раза.</p>
+
+<p>Однако, если в проекте используется библиотека логирования <em>slf4j</em>, можно обойтись малой кровью используя шаблоны в строках. Как это работает:</p>
+
+<p>Вместо конкатенации строк при логировании</p>
+
+<p><code>java
+log.debug("Processed request " + request + " sending response " + response);
+</code></p>
+
+<p>писать</p>
+
+<p><code>java
+log.debug("Processed request {} sending response {}", request, response);
+</code></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <updated>2012-01-09T13:07:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
+
+<p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>
+
+<p>Такая инженерная практика именуется <em>microbenchmarking</em>. Суть микробенчмаркинга в измерении производительности (загрузки процессора, памяти или операций с сетью, диском) небольших кусков кода для того, чтобы понять какой код лучше подходит для текущего сценария.</p>
+
+<p>Стоит заметить, что микробенчмаркинг и профайлинг -- это не одно и то же. Различия между ними напоминают различия между unit тестированием и интеграционным тестированием. Профайлинг подразумевает исследование производительности всего приложения в целом, тогда как микробенчмаркинг -- это, в свою очередь, исследование актуальной в данный момент функциональности.</p>
+
+<p>Зная что нужно измерять, написать бенчмарк довольно тривиально, и, часто, вполне можно обойтись одним единственным статическим методом main. Однако, используя фреймверк Caliper от компании Google, бенчмарки можно писать быстро и с удовольствием, выкинув при этом кучу boilerplate кода.</p>
+
+<p>API Caliper в чем то напоминает старую версию JUnit. Для того чтобы написать простой бенчмарк нужно:</p>
+
+<ol>
+<li>Отнаследоваться от класса com.google.caliper.SimpleBenchmark</li>
+<li>Написать тестовые методы, название которых начинается со слова time.</li>
+<li>Подготовка данных и очистка ресурсов происходит в методах setUp и tearDown соответственно.</li>
+</ol>
+
+
+<p>Caliper изначально поставляется с большим количеством примеров. Один из интересных <em>LoopingBackwardsBenchmark</em>, который сравнивает скорость итерирования вперед и назад.</p>
+
+<p>``` java LoopingBackwardsBenchmark
+public class LoopingBackwardsBenchmark extends SimpleBenchmark {</p>
+
+<pre><code>@Param({"2", "20", "2000", "2000000", "20000000", "200000000"})
+private int max;
+
+
+public int timeForwards(int reps) {
+    int dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        for (int j = 0; j &lt; max; j++) {
+            dummy += j;
+        }
+    }
+    return dummy;
+}
+
+
+public int timeBackwards(int reps) {
+    int dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        for (int j = max - 1; j &gt;= 0; j--) {
+            dummy += j;
+        }
+    }
+    return dummy;
+}
+
+
+public static void main(String[] args) throws Exception {
+    Runner.main(LoopingBackwardsBenchmark.class, args);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<p>Запустив тест мы убедимся, что разницы в производительности нет.</p>
+
+<p>Еще один пример. Допустим, мы разрабатываем функциональность которая предполагает огромное количество операций над дробными числами, и мы думаем стоит ли использовать BigDecimal или лучше остановить свой выбор на старом добром быстром double. Сравнить насколько медленней будет работать BigDecimal для такой операции как умножение не сложно.</p>
+
+<p>``` java "Double Vs BigDecimal"
+public class DoubleVsBigDecimalBenchmark extends SimpleBenchmark {</p>
+
+<pre><code>@Param({"1", "1.01", "1.0123456789", "20", "20.01", "20.0123456789", "1000000000", "1000000000.01", "1000000000.0123456789"})
+private double value;
+
+private BigDecimal[] bigDecimalVal = new BigDecimal[1];
+private double[] doubleVal = new double[1];
+
+@Override
+protected void setUp() throws Exception {
+    bigDecimalVal[0] = BigDecimal.valueOf(value);
+    doubleVal[0] = value;
+}
+
+
+public void timeDouble(int reps) {
+    double dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        int v = i / (reps + 1);
+        dummy = doubleVal[v] * doubleVal[v];
+    }
+    doubleVal[0] = dummy;
+}
+
+public void timeBigDecimal(int reps) {
+    BigDecimal dummy = BigDecimal.ZERO;
+    for (int i = 0; i &lt; reps; i++) {
+        int v = i / (reps + 1);
+        dummy = bigDecimalVal[v].multiply(bigDecimalVal[v]);
+    }
+    bigDecimalVal[0] = dummy;
+}
+
+public static void main(String[] args) {
+    Runner.main(DoubleVsBigDecimalBenchmark.class, new String[]{});
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Прогнав тест, становится видно, что для небольших чисел и чисел с небольшой дробной частью <em>BigDecimal</em> работает в 5 раз медленней, а для больших чисел либо чисел с большим количеством символов после запятой в 20 раз.</p>
+
+<p>Следует заметить, что JVM хитрая штука, и постоянно занимается оптимизацией кода, что сказывается на результатах бенчмарка, по-этому иногда надо выкручиваться. Например, в бенчмарке <em>DoubleVsBigDecimalBenchmark</em> используется массив и странный способ инициализации переменной <em>v</em> нулем.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[To GWT or not to GWT (Rus)]]></title>
+    <link href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
+    <updated>2011-05-14T13:13:00+03:00</updated>
+    <id>http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt</id>
+    <content type="html"><![CDATA[<p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript'e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
+
+<p>В последнее время мне удалось поработать с GWT, итак за и против.</p>
+
+<h3>За GWT:</h3>
+
+<ol>
+<li>Не нужно учить <em>Javascript</em>. Если вы гуру и не одну собаку съели педаля на жабе и принципиально не хотите учить javascript, то gwt в самый раз.</li>
+<li>Все приимущества <em>Java</em>. Статическая типизация, IDE, дебаггер, рефакторинги, анализаторы кода -- все к вашим услугам.</li>
+<li>Один код на сервере и на клиенте. Код написанный для сервера может быть скомпилирован в javascript и работать на клиенте.</li>
+<li>Google. GWT разрабатывается, не командой волосатых программистов из гаража, а корпорацией google и используется в проектах компании.</li>
+<li>Кросс-браузерность.Разрабатывая с помощью GWT можно не беспокоится про кросс-браузерность, клиент компилируется в поддерживаемый современными браузерами код.</li>
+</ol>
+
+
+<h3>Против GWT:</h3>
+
+<ol>
+<li>Java == No fun. Писать на жаве UI неудобно. Количество строк кода в результате -- огромно.</li>
+<li>Медленно. Скорость разработки на GWT на порядок меньше чем с помощью javascript'a. В большинстве из-за количества кода, которое приходится писать. Скорость работы GWT-овского компилятора уничтожает желание использовать GWT.</li>
+<li>Отсутсвие подходов к написанию программ с помощью GWT. Best practices и подходы по написанию программ с помощью GWT постоянно меняются. RequestFactory и Activity Framework до сих пор сырые.</li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>
