@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Caliper | Tail Spin]]></title>
+  <link href="http://mairbek.github.com/blog/categories/caliper/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-02-24T14:01:33+02:00</updated>
+  <id>http://mairbek.github.com/</id>
+  <author>
+    <name><![CDATA[Mairbek Khadikov]]></name>
+    <email><![CDATA[mkhadikov@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <updated>2012-01-09T13:07:00+02:00</updated>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
+
+<p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>
+
+<p>Такая инженерная практика именуется <em>microbenchmarking</em>. Суть микробенчмаркинга в измерении производительности (загрузки процессора, памяти или операций с сетью, диском) небольших кусков кода для того, чтобы понять какой код лучше подходит для текущего сценария.</p>
+
+<p>Стоит заметить, что микробенчмаркинг и профайлинг -- это не одно и то же. Различия между ними напоминают различия между unit тестированием и интеграционным тестированием. Профайлинг подразумевает исследование производительности всего приложения в целом, тогда как микробенчмаркинг -- это, в свою очередь, исследование актуальной в данный момент функциональности.</p>
+
+<p>Зная что нужно измерять, написать бенчмарк довольно тривиально, и, часто, вполне можно обойтись одним единственным статическим методом main. Однако, используя фреймверк Caliper от компании Google, бенчмарки можно писать быстро и с удовольствием, выкинув при этом кучу boilerplate кода.</p>
+
+<p>API Caliper в чем то напоминает старую версию JUnit. Для того чтобы написать простой бенчмарк нужно:</p>
+
+<ol>
+<li>Отнаследоваться от класса com.google.caliper.SimpleBenchmark</li>
+<li>Написать тестовые методы, название которых начинается со слова time.</li>
+<li>Подготовка данных и очистка ресурсов происходит в методах setUp и tearDown соответственно.</li>
+</ol>
+
+
+<p>Caliper изначально поставляется с большим количеством примеров. Один из интересных <em>LoopingBackwardsBenchmark</em>, который сравнивает скорость итерирования вперед и назад.</p>
+
+<p>``` java LoopingBackwardsBenchmark
+public class LoopingBackwardsBenchmark extends SimpleBenchmark {</p>
+
+<pre><code>@Param({"2", "20", "2000", "2000000", "20000000", "200000000"})
+private int max;
+
+
+public int timeForwards(int reps) {
+    int dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        for (int j = 0; j &lt; max; j++) {
+            dummy += j;
+        }
+    }
+    return dummy;
+}
+
+
+public int timeBackwards(int reps) {
+    int dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        for (int j = max - 1; j &gt;= 0; j--) {
+            dummy += j;
+        }
+    }
+    return dummy;
+}
+
+
+public static void main(String[] args) throws Exception {
+    Runner.main(LoopingBackwardsBenchmark.class, args);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<p>Запустив тест мы убедимся, что разницы в производительности нет.</p>
+
+<p>Еще один пример. Допустим, мы разрабатываем функциональность которая предполагает огромное количество операций над дробными числами, и мы думаем стоит ли использовать BigDecimal или лучше остановить свой выбор на старом добром быстром double. Сравнить насколько медленней будет работать BigDecimal для такой операции как умножение не сложно.</p>
+
+<p>``` java "Double Vs BigDecimal"
+public class DoubleVsBigDecimalBenchmark extends SimpleBenchmark {</p>
+
+<pre><code>@Param({"1", "1.01", "1.0123456789", "20", "20.01", "20.0123456789", "1000000000", "1000000000.01", "1000000000.0123456789"})
+private double value;
+
+private BigDecimal[] bigDecimalVal = new BigDecimal[1];
+private double[] doubleVal = new double[1];
+
+@Override
+protected void setUp() throws Exception {
+    bigDecimalVal[0] = BigDecimal.valueOf(value);
+    doubleVal[0] = value;
+}
+
+
+public void timeDouble(int reps) {
+    double dummy = 0;
+    for (int i = 0; i &lt; reps; i++) {
+        int v = i / (reps + 1);
+        dummy = doubleVal[v] * doubleVal[v];
+    }
+    doubleVal[0] = dummy;
+}
+
+public void timeBigDecimal(int reps) {
+    BigDecimal dummy = BigDecimal.ZERO;
+    for (int i = 0; i &lt; reps; i++) {
+        int v = i / (reps + 1);
+        dummy = bigDecimalVal[v].multiply(bigDecimalVal[v]);
+    }
+    bigDecimalVal[0] = dummy;
+}
+
+public static void main(String[] args) {
+    Runner.main(DoubleVsBigDecimalBenchmark.class, new String[]{});
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Прогнав тест, становится видно, что для небольших чисел и чисел с небольшой дробной частью <em>BigDecimal</em> работает в 5 раз медленней, а для больших чисел либо чисел с большим количеством символов после запятой в 20 раз.</p>
+
+<p>Следует заметить, что JVM хитрая штука, и постоянно занимается оптимизацией кода, что сказывается на результатах бенчмарка, по-этому иногда надо выкручиваться. Например, в бенчмарке <em>DoubleVsBigDecimalBenchmark</em> используется массив и странный способ инициализации переменной <em>v</em> нулем.</p>
+]]></content>
+  </entry>
+  
+</feed>

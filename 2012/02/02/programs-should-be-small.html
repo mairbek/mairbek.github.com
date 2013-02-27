@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Programs Should be Small - Tail Spin</title>
+  <meta name="author" content="Mairbek Khadikov">
+
+  
+  <meta name="description" content="Evolution of software matters How big is the source code you are working on? How many developers do you have in your team? If you are going to add &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mairbek.github.com/2012/02/02/programs-should-be-small.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Tail Spin" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29152018-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tail Spin</a></h1>
+  
+    <h2>Blog So Hard</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mairbek.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Blog</a></li>
+  <li><a href="http://github.com/mairbek">Projects</a></li>
+  <li><a href="http://ua.linkedin.com/in/mairbekkhadikov">Resume</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Programs Should Be Small</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T12:03:00+02:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Evolution of software matters</h2>
+
+<p>How big is the source code you are working on? How many developers do you have in your team? If you are going to add new feature tomorrow, how fast will you be able to do that?</p>
+
+<p>Maintainability matters. Well, it matters in case if you&#8217;re willing to build a successful applications evolving over the years. And if you would like to be able to quickly add new features you definitely want to see the developers spending most of the time on writing code and hacking on a new stuff.</p>
+
+<p>Working mostly on enterprise projects I used to see multi-developer teams working on a single gigantic piece of software, usually built using one particular technology. This turns out to be inefficient and leads to unmaintainable code. A developer on a such project is forced to spend most of his time on trying to understand the way the current system works instead of adding concrete value. And I&#8217;m sorry, there is no value in reading pages of purely written legacy code. The only real value programmer can add is a new code.</p>
+
+<p>Another disaster is the verification of the produced code. Getting instantaneous feedback by executing a newly written code is the essential part of the developer&#8217;s productivity. Unfortunately running enterprise software is usually a real pain. You are forced to use rare application servers, monstrous databases, and in addition you have huge codebase with everlasting build time.</p>
+
+<h2>Decomposition for the win</h2>
+
+<p>Increasing program-to-developer ratio is the way of building things that keeps the developers productive and happy. Instead of having hordes of programmers working on one single codebase, split your system to a small programs that could be deployed independently. Beautiful reusable code should be extracted as a libraries and be maintained independently. <a href="http://tom.preston-werner.com/2011/11/22/open-source-everything.html">Open source that libraries</a> if possible and you&#8217;ll get the feedback from the peers.</p>
+
+<p>Writing small programs or services, if we talk about web apps, benefits in long term perspective. First of all small services are easy to reason about. The key is to stick with <a href="http://en.wikipedia.org/wiki/Open/closed_principle">open closed principle</a>, write services that do one thing, and do it well. It&#8217;s easy to execute these services independently and see whether they work or not. For example for Gmail you might extract a service responsible for sending and receiving emails, you might have a separate service that does spam filtering, separate service for storing e-mails, a service that can apply filters and a standalone web-app that communicates with these services.</p>
+
+<p>One big advantage of splitting you program is that you are no longer restricted to use one particular platform. We know that <em>ruby</em> or <em>node.js</em> make you really productive in writing web apps but their performance is pretty inefficient comparing to <em>C++</em> or <em>Java</em>. Since we are able to deploy services independently we can forget about monolithic <em>Java EE</em> and combine different technologies and for example build a web app with <em>rails</em> and backend services using <em>C++</em> and use some convenient protocol like <a href="http://code.google.com/p/protobuf/">Protobuf</a> or <a href="http://thrift.apache.org/">Apache Thrift</a> for communication.</p>
+
+<p>Truth been told decomposition of the system is somewhat non-trivial. One thing is becoming obvious, well known layered architecture is going to ruin maintainability of your project. It&#8217;s tempting to stick with classical enterprise approach and create a service for accessing the database, service that encapsulates caching, service that does business logic and a presentation service. But features are cross-cutted usually through these layers. So any new sophisticated feature will require changes in every layer. In addition most of the code will be responsible for converting messages from one format to another.</p>
+
+<p>Software design and development is a pretty sophisticated activity and doesn&#8217;t fully depend on how smart you are and how many books you&#8217;ve read. It&#8217;s just so many thing you have to care about in order to achieve good quality solution. Keeping programs small is a great simple tool that allows you to reduce complexity of the solution and results in clean design and improved developers productivity.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mairbek Khadikov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-02T12:03:00+02:00" pubdate data-updated="true">Feb 2<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/architecture/'>Architecture</a>, <a class='category' href='/blog/categories/development-/'>Development,</a>, <a class='category' href='/blog/categories/programming-/'>Programming,</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mairbek.github.com/2012/02/02/programs-should-be-small.html" data-via="mairbek" data-counturl="http://mairbek.github.com/2012/02/02/programs-should-be-small.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2012/01/21/logging-gotcha.html" title="Previous Post: Logging Gotcha (Rus)">&laquo; Logging Gotcha (Rus)</a>
+      
+      
+        <a class="basic-alignment right" href="/2013/02/15/coordination-in-distributed-systems.html" title="Next Post: Coordination in Distributed Systems">Coordination in Distributed Systems &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/02/16/graph-search-architecture-overview.html">Graph Search Architecture Overview</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/02/15/coordination-in-distributed-systems.html">Coordination in Distributed Systems</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/02/02/programs-should-be-small.html">Programs Should be Small</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/21/logging-gotcha.html">Logging Gotcha (Rus)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/09/microbenchmarking-with-caliper.html">Microbenchmarking with Caliper (Rus)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/mairbek">@mairbek</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mairbek',
+            count: 3,
+            skip_forks: false,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("mairbek", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/mairbek" class="twitter-follow-button" data-show-count="false">Follow @mairbek</a>
+  
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/mkhadikov@gmail.com?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mairbek Khadikov -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

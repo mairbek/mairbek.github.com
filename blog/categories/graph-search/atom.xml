@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Graph Search | Tail Spin]]></title>
+  <link href="http://mairbek.github.com/blog/categories/graph-search/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-02-24T14:01:33+02:00</updated>
+  <id>http://mairbek.github.com/</id>
+  <author>
+    <name><![CDATA[Mairbek Khadikov]]></name>
+    <email><![CDATA[mkhadikov@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Graph Search Architecture Overview]]></title>
+    <link href="http://mairbek.github.com/2013/02/16/graph-search-architecture-overview.html"/>
+    <updated>2013-02-16T12:16:00+02:00</updated>
+    <id>http://mairbek.github.com/2013/02/16/graph-search-architecture-overview</id>
+    <content type="html"><![CDATA[<p>Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I've attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his <a href="http://en.wikipedia.org/wiki/Lars_Rasmussen_(software_developer)" title="Lars Rasmussen">resume</a>.</p>
+
+<p>Now <a href="http://incubator.apache.org/wave/" title="Apache Wave">Wave is dead</a>, Lars works for <a href="http://facebook.com/" title="Facebook">Facebook</a>, and they've recently announced <a href="https://www.facebook.com/about/graphsearch" title="Graph Search">graph search</a>, a technology that allows you to search anything shared with you on Facebook. I've been interested in the technical details for a while and lately I've found Lars <a href="http://www.reddit.com/r/IAmA/comments/18jb6d/i_am_the_pointyhaired_engineering_director_for/" title="Answers on reddit">answering questions on Reddit</a>. So for those who are lazy to read whole Q/As I've written a quick summary of graph search architecture quoting author as much as possible.</p>
+
+<p>At the back-end they have inverted-index system called <em>Unicorn</em> that is used to select nodes in the social graph based on edge-relationships to other nodes. <em>Unicorn</em> is akin to document search systems for other contexts like email, webpages, or files on your computer; but it also has some graph-centric features that make it especially useful for searching over the social graph.</p>
+
+<p>All the search requests from users are sent to the index servers. <em>Hive</em>, <em>Hadoop</em>, and <em>HBase</em> are used to convert database contents into an inverted index on a regular basis, and then they push messages to index servers to have realtime updates from the base index.</p>
+
+<p>When a user fires a search request the query gets translated two times. First NLP translator transforms natural language query to a semantic language that describes the interpretation of the natural language, and then further down in the stack they use an <em>s-expression</em> syntax to retrieve potential results from an inverted index.</p>
+
+<p>Lars gave the following example. When user types</p>
+
+<blockquote><p>My friends who live in Sydney, Australia</p></blockquote>
+
+<p>it is interpreted to semantical form of</p>
+
+<blockquote><p>intersect(friends(me), residents(110884905606108))</p></blockquote>
+
+<p>and then to s-expression</p>
+
+<blockquote><p>(and friend:767560056 city_to_user:110884905606108)</p></blockquote>
+
+<p>If you have tried graph search you may noticed that you can't use a random query to search stuff, when you start typing system automatically suggests you matched queries and you can fire only suggested ones. How does it work? At the core of the system sits a <a href="http://en.wikipedia.org/wiki/Context-free_grammar" title="Context-Free Grammar">Context-Free Grammar</a> describing all the queries the system can understand. The grammar in general contains many different ways of expressing the same question. As a user types in the search field, a <a href="http://en.wikipedia.org/wiki/Parsing" title="Parsing">Parser</a> attempts to find the queries from the grammar that most closely matches what the user has typed, and displays those as suggestions in a drop-down below the search field.</p>
+
+<p>As part of the parser they've developed <a href="http://en.wikipedia.org/wiki/Named-entity_recognition" title="Named Entity Recognition">named entity recognition engine</a>. For example, if you search for photos of <em>jane doe</em> the parser will figure out which Jane Doe you are looking for. When in doubt, they tend of course to pick the Jane who has the most friends in common with you.</p>
+
+<p>Graph search is an exciting piece of technology as mush as Wave was, and it definitely pushed industry forward. I hope you've find my notes interesting, and by the way I guess Lars is still answering the questions!</p>
+]]></content>
+  </entry>
+  
+</feed>

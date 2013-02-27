@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Coordination in Distributed Systems - Tail Spin</title>
+  <meta name="author" content="Mairbek Khadikov">
+
+  
+  <meta name="description" content="Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Tail Spin" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29152018-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tail Spin</a></h1>
+  
+    <h2>Blog So Hard</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mairbek.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Blog</a></li>
+  <li><a href="http://github.com/mairbek">Projects</a></li>
+  <li><a href="http://ua.linkedin.com/in/mairbekkhadikov">Resume</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Coordination in Distributed Systems</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-15T12:12:00+02:00" pubdate data-updated="true">Feb 15<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I&#8217;ve read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.</p>
+
+<p>So what do I mean by coordination? Let&#8217;s start with the simple one. Common challenge in distributed systems is getting the <em>naming</em> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.</p>
+
+<p><em>Configuration management</em> is another coordination problem that pops out frequently. Every sophisticated system has to deal with the configuration information. Property files may sound great but consider you have hundreds of nodes in the cluster running particular deployment packages and now you have to change the configuration property on all of this servers. It turns out that property files are great if configuration is static but using them for dynamic configuration doesn&#8217;t seems to be good idea.</p>
+
+<p>To explain next problem named <em>group membership</em> let&#8217;s picture some real world project. Imagine you are working on a social network web-site and there are two types of distributed processes: front-end servers that handle http requests and image servers responsible for efficient image storage. Whenever user uploads the photo, front-end server has to communicate with the image storage to save the image, so front-end server has to be configured to know the addresses of the image servers. Now suddenly this photo sharing feature becomes extremely popular and we need to increase number of image servers in order to handle all content uploads. In addition let&#8217;s be realistic and accept the fact that some of the servers might fail and we need to track that information and avoid sending requests to the failed server. Sounds non-trivial.</p>
+
+<p>If you worked on multi-threaded programs, apparently you should be familiar with the concurrency issues. While developing distributed app we basically face the same challenges as we would face in the multi-threaded environment plus. In the distributed system race conditions between the processes could easily happen if there are some shared resources, so you might be forced to implement some decent <em>locking</em> mechanism to solve them. Race condition is not the only issue, some of your data may require ACID guaranties (atomicity, consistency, integrity and durability) and you should be ready to get you hands dirty and implement transactions by yourself.</p>
+
+<p>Many popular distributed databases, search servers, file systems require single master node to coordinate activities across other nodes in some way. But how do you select the master? Obvious way to do this is to choose it by yourself. It works but as we already know, predefined configuration is not that flexible. Plus, remember we are living in distributed world, we need master to be fault tolerant: in case if current master crashes some other node should come up and do the job. The problem of automatically select(elect) master(leader) process is called <em>leader election</em>. Technically speaking leader election is the same old <em>locking</em> problem. Think of leader as a process that acquired and holds lock forever until shut down or failed. But since it is frequently encountered it is considered separately.</p>
+
+<p>Coordination problems I&#8217;ve described may sound easy but implementing them correctly in fault tolerant way may lead you to the nights of hardcore debugging of highly concurrent code. No fun, believe me, I&#8217;ve seen a project where custom distributed transactions are implemented. Fortunately, <a href="http://zookeeper.apache.org/">Apache ZooKeeper</a> comes to rescue by providing set of reliable primitives, building blocks that allow us to tackle coordination problems with ease.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mairbek Khadikov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-15T12:12:00+02:00" pubdate data-updated="true">Feb 15<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/apache-zookeeper/'>Apache ZooKeeper</a>, <a class='category' href='/blog/categories/coordination/'>Coordination</a>, <a class='category' href='/blog/categories/distributed-systems/'>Distributed Systems</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html" data-via="mairbek" data-counturl="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2012/02/02/programs-should-be-small.html" title="Previous Post: Programs Should be Small">&laquo; Programs Should be Small</a>
+      
+      
+        <a class="basic-alignment right" href="/2013/02/16/graph-search-architecture-overview.html" title="Next Post: Graph Search Architecture Overview">Graph Search Architecture Overview &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/02/16/graph-search-architecture-overview.html">Graph Search Architecture Overview</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/02/15/coordination-in-distributed-systems.html">Coordination in Distributed Systems</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/02/02/programs-should-be-small.html">Programs Should be Small</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/21/logging-gotcha.html">Logging Gotcha (Rus)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/09/microbenchmarking-with-caliper.html">Microbenchmarking with Caliper (Rus)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/mairbek">@mairbek</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mairbek',
+            count: 3,
+            skip_forks: false,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("mairbek", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/mairbek" class="twitter-follow-button" data-show-count="false">Follow @mairbek</a>
+  
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/mkhadikov@gmail.com?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mairbek Khadikov -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
