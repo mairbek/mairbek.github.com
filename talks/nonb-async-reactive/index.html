@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Asynchronous RPC with Finagle - Mairbek Khadikov</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-29152018-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ 
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+        <h2>Non-blocking, Asynchronous and Reactive Programming in JVM</h2>
+          <br/>
+
+          <br/>
+          <br/>
+          <br/>
+					<p>
+						<small>By <a href="http://mkhadikov.com">Mairbek Khadikov</a> / <a href="http://twitter.com/mairbek">@mairbek</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h3>About me</h3>
+					<br/>
+					<ul>
+						<li>Coder</li>
+						<li>Sometimes Blogger</li>
+						<li>Sometimes Speaker</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h3>
+						How many of you are working on distributed systems?
+					</h3>
+					<br/>
+					<ul>
+						<li class="fragment">Do you use databases?</li>
+						<li class="fragment">Or caching servers?</li>
+						<li class="fragment">Or integration with REST Service?</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>
+						Most of the services these days are I/O bound instead of CPU bound 
+					</h3>
+					<br/>
+					<ul>
+						<li class="fragment">If you care about performance</li>
+						<li class="fragment">If you design for low latency and high throughput</li>
+					</ul>
+
+				</section>
+
+				<section>
+					<h2>Blocking I/O</h2>
+					<p>
+						Most of the time application waits for I/O operation to be completed
+					</p>
+				</section>
+
+				<section>
+					<h2>Non-blocking I/O</h2>
+					<p>
+						Utilize the resources instead of waiting for I/O
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Non-blocking I/O</h2>
+					<p>
+						Simply means that the call returns immediately without any Thread#sleep
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Hardware blocking write</h2>
+					<p>
+						<span style="color: #ff0000">TODO</span>
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Hardware non-blocking write</h2>
+					<p>
+						<span style="color: #ff0000">TODO</span>
+					</p>
+				</section>
+
+				<section>
+					<h2>Non-blocking on the OS level</h2>
+					<p>
+						<span style="color: #ff0000">TODO</span>
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Java NIO. Non-blocking in Java</h2>
+					<p>
+<pre><code contenteditable>while(true) {
+  Set<SelectionKey> selectedKeys = selector.selectedKeys();
+  Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+
+  while(keyIterator.hasNext()) {
+    SelectionKey key = keyIterator.next();
+    if(key.isAcceptable()) {
+        // a connection was accepted by a ServerSocketChannel.
+    } else if (key.isConnectable()) {
+        // a connection was established with a remote server.
+    } else if (key.isReadable()) {
+        // a channel is ready for reading
+    } else if (key.isWritable()) {
+        // a channel is ready for writing
+    }
+    keyIterator.remove();
+  }
+}					</code></pre>
+						
+					</p>
+				</section>
+
+				<section>
+					<h2>Netty</h2>
+					<p>
+						Simplifies writing servers/clients
+					</p>
+				</section>
+
+				<section>
+					<h2>Netty. Simplifies writing servers/clients</h2>
+					<br/>
+					<ul>
+						<li>Encapsulates Threading</li>
+						<li>Easy to Implement Protocols</li>
+						<li>Event-driven</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Netty. Encapsulates Threading</h2>
+
+
+					<br/>
+					<h3>Boss thread pool</h3>
+					<br/>
+					<ul>
+						<li>Handles the connections</li>
+						<li>Assigns Channels to the worker threads</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Netty. Encapsulates Threading</h2>
+
+
+					<br/>
+					<h3>Worker thread pool</h3>
+					<br/>
+					<ul>
+						<li>Performs non-blocking read and write for one or more Channels</li>
+						<li>Fires events on a pipeline</li>
+					</ul>
+				</section>
+
+
+				<section>
+					<h2>Netty. Easy to Implement Protocols</h2>
+
+					<span style="color: #ff0000;">Pipelines images</span>
+
+				</section>
+
+
+
+				<section>
+					<h2>Netty. Event-driven</h2>
+
+<br/>
+<pre><code>
+public class MyHandler extends SimpleChannelUpstreamHandler {
+
+     @Override
+     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+     	Object msg = e.getMessage();
+     	// Logic goes here
+     }
+ 
+ }
+
+</code></pre>
+
+				</section>
+
+
+				<section>
+					<h2>JDK 7 NIO.2</h2>
+
+					<p>Asynchronous I/O</p>
+				</section>
+
+
+				<section>
+					<h2>Asynchronous I/O in Java 7</h2>
+
+					<li>java.nio.channels.AsynchronousSocketChannel</li>
+					<li>java.nio.channels.AsynchronousServerSocketChannel</li>
+				</section>
+
+
+				<section>
+					<h2>Asynchronous I/O in Java 7</h2>
+
+<pre><code>
+final AsynchronousServerSocketChannel listener =
+  AsynchronousServerSocketChannel.open().bind(new InetSocketAddress(5000));
+
+listener.accept(null, new CompletionHandler<AsynchronousSocketChannel,Void>() {
+  public void completed(AsynchronousSocketChannel ch, Void att) {
+      // accept the next connection
+      listener.accept(null, this);
+
+      // handle this connection
+      handle(ch);
+  }
+  public void failed(Throwable exc, Void att) {
+      ...
+  }
+});
+</code></pre>
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+
+					<br/>
+					<h3>Synchronous<h3>
+					<br/>
+					<p><pre><code contenteditable>
+interface UserService {
+	User getUser(String email);
+}
+					</code></pre></p>
+
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+
+					<br/>
+					<h3>Hollywood principle</h3>
+					<br/>
+					<p>
+						Don't call us, we'll call you! 
+					</p>
+				</section>
+
+				<section>
+					<h2>Synchronous vs Asynchronous</h2>
+					<br/>
+					<h3>Asynchronous with callback</h3>
+					<br/>
+					<p><pre><code contenteditable>
+
+interface UserCallback {
+
+	void onComplete(User user);
+
+	void onFailure(Throwable error);
+
+}
+
+interface UserService {
+	void getUser(String email, UserCallback callback);
+}
+
+					</code></pre></p>
+
+				</section>
+
+
+				<section>
+					<h2>Difference Between Non-Blocking and Asynchronous</h2>
+
+					<br/>
+					<ul>
+						<li>Asynchronous means that it is something that call is not done synchronously. Usually in parallel in another thread.</li>
+						<li>Non-blocking means that thread is not blocking during the call. Usually it refers to the polling, i.e. constantly checking whether given condition holds</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Callbacks don't compose well </h2>
+					<p>
+					</p>
+				</section>
+
+				<section>
+					<h2>Composition?</h2>
+					<p>
+						<br/>
+						
+						<ul>
+							<li>Execute several asynchornous call sequentially</li>
+							<li>Join the result of several async executions</li>
+							<li>Select the first successfully executed async request</li>
+						</ul>
+
+					</p>
+				</section>
+
+
+				<section>
+					<h2>Callbacks don't compose well</h2>
+					<p>
+						Try to implement sequence of asynchronous calls
+					</p>
+				</section>
+
+				<section>
+					<h2>Callbacks don't compose well</h2>
+					<p>
+						Try to combine result of concurrent asynchronous calls
+					</p>
+				</section>
+
+				<section>
+					<h2>Callback is a wrong abstraction</h2>
+					<p>
+						Languages are simply designed for serial execution
+					</p>
+				</section>
+        
+        		<section>
+					<h2>Callback is a wrong abstraction</h2>
+					<p>
+						Try to cancel asynchronous request with callback
+					</p>
+				</section>
+        
+				<section>
+					<h2>Future</h2>
+					<p>Represents a computation that has not yet completed, which can either succeed or fail</p>
+				</section>
+
+				<section>
+					<h2>Future</h2>
+					<p>Usually computed concurrently</p>
+				</section>
+
+				<section>
+					<h2>Future (Blocking)</h2>
+					<br/>
+					<p><pre><code contenteditable>
+trait Future[A]
+
+// Get value. Blocks until completed
+val f : Future[A]
+println(f())
+
+// Get value with timeout
+val f : Future[A]
+println(f(1.second))
+
+// Can throw exception
+f.get() match {
+  case Return(res) => ...
+  case Throw(exc) => ...
+}
+
+					</code></pre></p>
+				</section>
+
+				<section>
+					<h2>Future (Async)</h2>
+					<br/>
+					<p><pre><code contenteditable>
+// Good old callback
+
+val f: Future[String]
+
+f onSuccess { s =>
+  log.info(s)
+} onFailure { e =>
+  log.error(e)
+}
+					</code></pre></p>
+				</section>
+
+				<section>
+					<h2>Futures compose well</h2>
+					<p></p>
+				</section>
+
+
+				<section>
+					<h2>Not Java Futures, though</h2>
+					<p></p>
+				</section>
+
+
+				<section>
+					<h2>Not Java Futures, though</h2>
+					<ul>
+						<li>Akka</li>
+						<li>Finagle</li>
+						<li>Scala 2.10</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Future is a Monad </h2>
+					<p></p>
+				</section>
+
+				<section>
+					<h2>Monad for Humans</h2>
+					<p>
+						Fancy control-flow
+					</p>
+				</section>
+
+				<section>
+					<h2>Future as a Functor</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+
+def map[B](f: A => B): Future[B]	
+
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Future as a Functor</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+
+def map[B](f: A => B): Future[B]	
+
+val f : Future[List[User]]
+val fcount = f.map(_.size)
+println(fcount())
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Functor is cool, but</h2>
+					<p><pre><code contenteditable>
+
+val fUser : Future[UserData] = getUserData(token)
+val fFriends = fUser.map(user => getFriends(user))
+println(fFriends()) // Future[Future[List[User]]]
+					</pre></code></p>
+				</section>
+
+				<section>
+					<h2>flatMap to rescue</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+def flatMap[B](f: A => Future[B]): Future[B]
+					</pre></code></p>
+				</section>
+
+
+
+				<section>
+					<h2>flatMap</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+val f = userIdGenerator.generateId flatMap {id => 
+	facebookClient.getUserData(token) flatMap {userData=>
+		userRepository.addUser(id, userData) flatMap {_=>
+			notificationService.sendEmail(userData.email).map(_=>id)
+		}
+	}
+}
+
+println(f.get)
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>For comprehension</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+val f = for {
+	id <- userIdGenerator.generateId
+	userData <- facebookClient.getUserData(token)
+	_ <- userRepository.addUser(id, userData)
+	_ <- notificationService.sendEmail(userData.email)
+} yield (id)
+
+println(f.get)
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+
+				<section>
+					<h2>Other Monads</h2>
+					<ul>
+						<li>Option</li>
+						<li>List</li>
+						<li>State</li>
+						<li>etc.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Concurrent compositions</h2>
+					<br/>	
+					<p><pre><code contenteditable>
+def collect[A](fs: Seq[Future[A]]): Future[Seq[A]]
+
+def join(fs: Seq[Future[_]]): Future[Unit]
+
+def select(fs: Seq[Future[A]]) : Future[(Try[A], Seq[Future[A]])]
+
+					</pre></code></p>
+					<br/>
+					<br/>
+					<br/>
+				</section>
+				<section>
+					<h1>Thank You!</h1>
+					<br/>
+					<h2>Mairbek Khadikov</h2>
+					<br/>
+					<p><a href="http://mkhadikov.com">mkhadikov.com</a></p>
+					<p><a href="http://twitter.com/mairbek">@mairbek</a></p>
+					<p><a href="mailto:mkhadikov@gmail.com">mkhadikov@gmail.com</a></p>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
