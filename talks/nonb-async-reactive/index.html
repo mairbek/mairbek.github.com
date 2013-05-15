@@ -110,30 +110,6 @@
 					</p>
 				</section>
 
-
-				<section>
-					<h2>Non-blocking I/O</h2>
-					<p>
-						Simply means that the call returns immediately without any Thread#sleep
-					</p>
-				</section>
-
-
-				<section>
-					<h2>Hardware blocking write</h2>
-					<p>
-						<span style="color: #ff0000">TODO</span>
-					</p>
-				</section>
-
-
-				<section>
-					<h2>Hardware non-blocking write</h2>
-					<p>
-						<span style="color: #ff0000">TODO</span>
-					</p>
-				</section>
-
 				<section>
 					<h2>Non-blocking on the OS level</h2>
 					<p>
@@ -164,6 +140,13 @@
   }
 }					</code></pre>
 						
+					</p>
+				</section>
+
+				<section>
+					<h2>Java NIO</h2>
+					<p>
+						Challenging to use in practice
 					</p>
 				</section>
 
@@ -241,42 +224,43 @@ public class MyHandler extends SimpleChannelUpstreamHandler {
 
 				</section>
 
-
 				<section>
-					<h2>JDK 7 NIO.2</h2>
+					<h2>Non-Blocking vs Asynchronous</h2>
 
-					<p>Asynchronous I/O</p>
+					<br />
+					<table>
+						<tr>
+							<td>
+								<h3>Asynchronous</h3>
+								<p>
+									Simply, function call is not done synchronously
+								</p>
+							<td>
+								<h3>Non-blocking</h3>
+								<p>Simply, thread is not blocking during the call</p>	
+						</tr>
+					</table>
+
 				</section>
 
-
 				<section>
-					<h2>Asynchronous I/O in Java 7</h2>
+					<h2>Non-Blocking vs Asynchronous</h2>
 
-					<li>java.nio.channels.AsynchronousSocketChannel</li>
-					<li>java.nio.channels.AsynchronousServerSocketChannel</li>
-				</section>
+					<br />
+					<table>
+						<tr>
+							<td>
+								<h3>Asynchronous</h3>
+								<p>
+									Usually something executed in parallel in another thread
+								</p>
+							<td>
+								<h3>Non-blocking</h3>
+								<p>Usually it refers to the polling, i.e. constantly checking whether given condition holds</p>	
+						</tr>
+					</table>
 
 
-				<section>
-					<h2>Asynchronous I/O in Java 7</h2>
-
-<pre><code>
-final AsynchronousServerSocketChannel listener =
-  AsynchronousServerSocketChannel.open().bind(new InetSocketAddress(5000));
-
-listener.accept(null, new CompletionHandler<AsynchronousSocketChannel,Void>() {
-  public void completed(AsynchronousSocketChannel ch, Void att) {
-      // accept the next connection
-      listener.accept(null, this);
-
-      // handle this connection
-      handle(ch);
-  }
-  public void failed(Throwable exc, Void att) {
-      ...
-  }
-});
-</code></pre>
 				</section>
 
 				<section>
@@ -327,16 +311,6 @@ interface UserService {
 
 				</section>
 
-
-				<section>
-					<h2>Difference Between Non-Blocking and Asynchronous</h2>
-
-					<br/>
-					<ul>
-						<li>Asynchronous means that it is something that call is not done synchronously. Usually in parallel in another thread.</li>
-						<li>Non-blocking means that thread is not blocking during the call. Usually it refers to the polling, i.e. constantly checking whether given condition holds</li>
-					</ul>
-				</section>
 
 				<section>
 					<h2>Callbacks don't compose well </h2>
@@ -397,6 +371,22 @@ interface UserService {
 					<p>Usually computed concurrently</p>
 				</section>
 
+
+				<section>
+					<h2>Futures compose well</h2>
+					<p></p>
+				</section>
+
+
+				<section>
+					<h2>Not Java Futures, though</h2>
+					<ul>
+						<li>Akka</li>
+						<li>Finagle</li>
+						<li>Scala 2.10</li>
+					</ul>
+				</section>
+
 				<section>
 					<h2>Future (Blocking)</h2>
 					<br/>
@@ -434,27 +424,6 @@ f onSuccess { s =>
   log.error(e)
 }
 					</code></pre></p>
-				</section>
-
-				<section>
-					<h2>Futures compose well</h2>
-					<p></p>
-				</section>
-
-
-				<section>
-					<h2>Not Java Futures, though</h2>
-					<p></p>
-				</section>
-
-
-				<section>
-					<h2>Not Java Futures, though</h2>
-					<ul>
-						<li>Akka</li>
-						<li>Finagle</li>
-						<li>Scala 2.10</li>
-					</ul>
 				</section>
 
 				<section>
@@ -580,6 +549,8 @@ def select(fs: Seq[Future[A]]) : Future[(Try[A], Seq[Future[A]])]
 					<br/>
 					<br/>
 				</section>
+
+
 				<section>
 					<h1>Thank You!</h1>
 					<br/>
