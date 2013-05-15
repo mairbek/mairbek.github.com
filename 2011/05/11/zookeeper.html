@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>ZooKeeper Intro (Rus) - Tail Spin</title>
+  <meta name="author" content="Mairbek Khadikov">
+
+  
+  <meta name="description" content="Любое распределенное приложение не может обойтись без центрального сервиса, который координирует процессы в нем. Реализовывать координацию можно, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mkhadikov.com/2011/05/11/zookeeper.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Tail Spin" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29152018-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tail Spin</a></h1>
+  
+    <h2>Blog So Hard</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mkhadikov.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Blog</a></li>
+  <li><a href="http://github.com/mairbek">Projects</a></li>
+  <li><a href="http://ua.linkedin.com/in/mairbekkhadikov">Resume</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">ZooKeeper Intro (Rus)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-11T13:16:00+03:00" pubdate data-updated="true">May 11<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Любое распределенное приложение не может обойтись без центрального сервиса, который координирует процессы в нем. Реализовывать координацию можно, однако разработка отказоустйчивой системы координации без deadlock&#8217;ов и race conditions &#8211; задача не из тривиальных. Проект <em>Apache ZooKeeper</em> призван избавить нас от решения этой проблемы.</p>
+
+<p><em>ZooKeeper</em> &#8211; это распределенный, open-source сервис координнации для расспределенных приложений. Он предоставляет низкоуровневый API, с помощью которого приложения могут реализовать высокоуровневые сервисы для координации и синхронизации процессов в расспредеелнной системе.</p>
+
+<p>API ZooKeeper&#8217;a черезвычайно прост. Распределенные процессы могут координироваться между собой с помощью расшаренной на всех клиентов иерархии znode&#8217;ов, организация которых по структуре похожа на файловую систему. Как и в файловой системе каждый znode идентифицируется своим уникальным путем, вида <code>/node1/stuff/logs</code>. В отличии от привычной файловой системы, каждый znode может быть корневым узлом для других znode&#8217;ов. Если говорить в терминах файловой системы: файл может выступать в роли директории. Znode&#8217;ы версионируются и ZooKeeper позволяет &#8220;смотреть&#8221;(watch) за изменениями в ноде. Как только znode&#8217;a изменяется, клиент, смотрящий за нодой, получает пакет, который говорит что в ноде произошло измение.</p>
+
+<p>ZooKeeper реплицируемый и обрабатывает команды в строгой последовательности. Первое намного повышает его надежность, второе дает возможность пользователям разрабатывать примитивы синхронизации для распределенных систем. Все данные ZooKeeper держит в памяти, что позволяет ему работать черезвычайно быстро. Разработчики дауют нам следующие гарантии:</p>
+
+<ul>
+<li><em>Sequential Consistency</em> &#8211; Обновления от клиента будут применены в порядке в котором они были отправены</li>
+<li><em>Atomicity</em> &#8211; Изменения от клиента атомарны, они либо исполняются либо нет</li>
+<li><em>Single System Image</em> &#8211; Клиент получет одинаковый набор znode&#8217;ов вне зависимости от того к какому серверу он подключен</li>
+<li><em>Reliability</em> &#8211; Как только измение было применено, состояние будет неизменно до тех пор пока клиент не перетрет его</li>
+<li><em>Timeliness</em> &#8211; Состояние системы для клиент гарантированно up-to-date с некоторой погрешностью по времени</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mairbek Khadikov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-11T13:16:00+03:00" pubdate data-updated="true">May 11<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/apache-zookeeper/'>Apache ZooKeeper</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mkhadikov.com/2011/05/11/zookeeper.html" data-via="mairbek" data-counturl="http://mkhadikov.com/2011/05/11/zookeeper.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2011/04/03/automation.html" title="Previous Post: Не бойтесть автоматизировать">&laquo; Не бойтесть автоматизировать</a>
+      
+      
+        <a class="basic-alignment right" href="/2011/05/14/to-gwt-or-not-to-gwt.html" title="Next Post: To GWT or not to GWT (Rus)">To GWT or not to GWT (Rus) &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/02/16/graph-search-architecture-overview.html">Graph Search Architecture Overview</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/02/15/coordination-in-distributed-systems.html">Coordination in Distributed Systems</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/02/02/programs-should-be-small.html">Programs Should be Small</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/21/logging-gotcha.html">Logging Gotcha (Rus)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/09/microbenchmarking-with-caliper.html">Microbenchmarking with Caliper (Rus)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/mairbek">@mairbek</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mairbek',
+            count: 3,
+            skip_forks: false,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("mairbek", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/mairbek" class="twitter-follow-button" data-show-count="false">Follow @mairbek</a>
+  
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/mkhadikov@gmail.com?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mairbek Khadikov -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

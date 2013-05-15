@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Graph Search Architecture Overview - Tail Spin</title>
+  <meta name="author" content="Mairbek Khadikov">
+
+  
+  <meta name="description" content="Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I&# &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mkhadikov.com/2013/02/16/graph-search-architecture-overview.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Tail Spin" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29152018-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Tail Spin</a></h1>
+  
+    <h2>Blog So Hard</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mkhadikov.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Blog</a></li>
+  <li><a href="http://github.com/mairbek">Projects</a></li>
+  <li><a href="http://ua.linkedin.com/in/mairbekkhadikov">Resume</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Graph Search Architecture Overview</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-16T12:16:00+02:00" pubdate data-updated="true">Feb 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I&#8217;ve attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his <a href="http://en.wikipedia.org/wiki/Lars_Rasmussen_(software_developer)" title="Lars Rasmussen">resume</a>.</p>
+
+<p>Now <a href="http://incubator.apache.org/wave/" title="Apache Wave">Wave is dead</a>, Lars works for <a href="http://facebook.com/" title="Facebook">Facebook</a>, and they&#8217;ve recently announced <a href="https://www.facebook.com/about/graphsearch" title="Graph Search">graph search</a>, a technology that allows you to search anything shared with you on Facebook. I&#8217;ve been interested in the technical details for a while and lately I&#8217;ve found Lars <a href="http://www.reddit.com/r/IAmA/comments/18jb6d/i_am_the_pointyhaired_engineering_director_for/" title="Answers on reddit">answering questions on Reddit</a>. So for those who are lazy to read whole Q/As I&#8217;ve written a quick summary of graph search architecture quoting author as much as possible.</p>
+
+<p>At the back-end they have inverted-index system called <em>Unicorn</em> that is used to select nodes in the social graph based on edge-relationships to other nodes. <em>Unicorn</em> is akin to document search systems for other contexts like email, webpages, or files on your computer; but it also has some graph-centric features that make it especially useful for searching over the social graph.</p>
+
+<p>All the search requests from users are sent to the index servers. <em>Hive</em>, <em>Hadoop</em>, and <em>HBase</em> are used to convert database contents into an inverted index on a regular basis, and then they push messages to index servers to have realtime updates from the base index.</p>
+
+<p>When a user fires a search request the query gets translated two times. First NLP translator transforms natural language query to a semantic language that describes the interpretation of the natural language, and then further down in the stack they use an <em>s-expression</em> syntax to retrieve potential results from an inverted index.</p>
+
+<p>Lars gave the following example. When user types</p>
+
+<blockquote><p>My friends who live in Sydney, Australia</p></blockquote>
+
+<p>it is interpreted to semantical form of</p>
+
+<blockquote><p>intersect(friends(me), residents(110884905606108))</p></blockquote>
+
+<p>and then to s-expression</p>
+
+<blockquote><p>(and friend:767560056 city_to_user:110884905606108)</p></blockquote>
+
+<p>If you have tried graph search you may noticed that you can&#8217;t use a random query to search stuff, when you start typing system automatically suggests you matched queries and you can fire only suggested ones. How does it work? At the core of the system sits a <a href="http://en.wikipedia.org/wiki/Context-free_grammar" title="Context-Free Grammar">Context-Free Grammar</a> describing all the queries the system can understand. The grammar in general contains many different ways of expressing the same question. As a user types in the search field, a <a href="http://en.wikipedia.org/wiki/Parsing" title="Parsing">Parser</a> attempts to find the queries from the grammar that most closely matches what the user has typed, and displays those as suggestions in a drop-down below the search field.</p>
+
+<p>As part of the parser they&#8217;ve developed <a href="http://en.wikipedia.org/wiki/Named-entity_recognition" title="Named Entity Recognition">named entity recognition engine</a>. For example, if you search for photos of <em>jane doe</em> the parser will figure out which Jane Doe you are looking for. When in doubt, they tend of course to pick the Jane who has the most friends in common with you.</p>
+
+<p>Graph search is an exciting piece of technology as mush as Wave was, and it definitely pushed industry forward. I hope you&#8217;ve find my notes interesting, and by the way I guess Lars is still answering the questions!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mairbek Khadikov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-02-16T12:16:00+02:00" pubdate data-updated="true">Feb 16<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/architecture/'>Architecture</a>, <a class='category' href='/blog/categories/graph-search/'>Graph Search</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://mkhadikov.com/2013/02/16/graph-search-architecture-overview.html" data-via="mairbek" data-counturl="http://mkhadikov.com/2013/02/16/graph-search-architecture-overview.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2013/02/15/coordination-in-distributed-systems.html" title="Previous Post: Coordination in Distributed Systems">&laquo; Coordination in Distributed Systems</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/02/16/graph-search-architecture-overview.html">Graph Search Architecture Overview</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/02/15/coordination-in-distributed-systems.html">Coordination in Distributed Systems</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/02/02/programs-should-be-small.html">Programs Should be Small</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/21/logging-gotcha.html">Logging Gotcha (Rus)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/01/09/microbenchmarking-with-caliper.html">Microbenchmarking with Caliper (Rus)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/mairbek">@mairbek</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mairbek',
+            count: 3,
+            skip_forks: false,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("mairbek", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/mairbek" class="twitter-follow-button" data-show-count="false">Follow @mairbek</a>
+  
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/mkhadikov@gmail.com?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Mairbek Khadikov -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
