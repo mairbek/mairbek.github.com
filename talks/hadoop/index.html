@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Asynchronous RPC with Finagle - Mairbek Khadikov</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-29152018-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ 
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+          <h2>Apache Hadoop Talks</h2>
+          <br/>
+					<h4>Akvelon, Kharkiv</h4>
+          <br/>
+					<p>
+						<small>By <a href="http://mairbek.github.com">Mairbek Khadikov</a> / <a href="http://twitter.com/mairbek">@mairbek</a></small>
+					</p>
+				</section>
+
+        <section>
+          <h2>Why do we need something like Hadoop?</h2>
+        </section>
+
+        <section>
+          <h3>Why do we need something like Hadoop?</h3>
+
+          <ul>
+            <li>Store large amount of data</li>
+            <li>Process it in some way</li>
+          </ul>
+        </section>
+
+
+        <section>
+          <h3>Today</h3>
+          <br />
+
+          <ul>
+            <li>HDFS</li>
+            <li>MapReduce</li>
+          </ul>
+        </section>
+
+
+        <section>
+          <h3>Why store large amount of data?</h3>
+          <br />
+
+          <p>More data you've colleceted more you can mine from it</p>
+        </section>
+
+
+        <section>
+          <h3>Large amount of data</h3>
+          <br />
+
+          <p>Petabytes</p>
+        </section>
+
+        <section>
+          <h2>What are requirements to such system?</h2>
+        </section>
+
+        <section>
+          <h3>Runs on commodity hardware</h3>
+          <br />
+        </section>
+
+        <section>
+          <h3>Scales horizontally</h3>
+          <br />
+        </section>
+
+        <section>
+          <h3>Deals with hardware failures</h3>
+        </section>
+
+        <section>
+          <h3>High Throughput</h3>
+        </section>
+
+        <section>
+          <h2>HDFS – Hadoop Distributed File System</h2>
+        </section>
+
+        <section>
+          <h3>HDFS – Hadoop Distributed File System</h3>
+
+          <p>Distributed file system based on GFS<sup>*</sup></p>
+          <br />
+          <br />
+          <br />
+          <br />
+          <small><a href="http://research.google.com/archive/gfs.html"><sup>*</sup>Google File System</a></small>
+        </section>
+
+        <section>
+          <h3>HDFS – Masert/Salve Architecture</h3>
+
+          <ul>
+            <li>Distributed</li>
+            <li>Single Name Node</li>
+            <li>Multiple Data Nodes</li>
+          </ul>
+        </section>
+
+
+        <section>
+          <h3>HDFS – Name Node</h3>
+
+          <ul>
+            <li>Manages the file system namespace</li>
+            <li>Maps blocks to Data Nodes</li>
+            <li>Regulates access to files by clients</li>
+            <li>Blocks replication</li>
+          </ul>
+        </section>				
+
+        <section>
+          <h3>HDFS – Data Node</h3>
+
+          <ul>
+            <li>Processes read and write</li>
+            <li>Stores data blocks</li>
+          </ul>
+        </section>				
+
+        <section>
+          <h3>HDFS – Masert/Salve Architecture</h3>
+
+          <img src="hdfsarchitecture.gif" alt="Hdfs Architecture" />
+        </section>
+
+        <section>
+          <h3>HDFS – API</h3>
+
+          <p>Simply a file system<pre><code contenteditable>
+$ hadoop fs -ls /
+
+drwxr-xr-x   - mkhadikov supergroup          0 2013-06-13 11:55 /data
+drwxr-xr-x   - mkhadikov supergroup          0 2013-05-24 12:51 /gutenberg
+drwxr-xr-x   - mkhadikov supergroup          0 2013-06-13 11:21 /hbase
+drwxr-xr-x   - mkhadikov supergroup          0 2013-06-12 17:03 /socrata
+
+          </code></pre></p>
+
+        </section>				
+
+        <section>
+          <h3>HDFS – API</h3>
+
+          <p>Simply a file system<pre><code contenteditable>
+$ hadoop fs -ls /
+$ hadoop fs -mkdir test
+$ hadoop fs -rm test
+
+          </code></pre></p>
+
+        </section>				
+
+        <section>
+          <h3>HDFS – Java API</h3>
+
+          <p>Simply a file system<pre><code contenteditable>
+
+Configuration conf = new Configuration();
+
+FileSystem fs = FileSystem.get(conf);
+
+Path path = new Path("/myfile");
+
+InputStream input = fs.open(path);
+
+OutputStream output = fs.create(path); // or 'append'
+
+          </code></pre></p>
+
+        </section>				
+
+        <section>
+          <h2>MapReduce</h2>
+        </section>
+
+
+        <section>
+          <h3>Map and Reduce from FP</h3>
+          <pre><code contenteditable>
+map(lambda word: len(word), ["one", "two", "three"])
+# [3 3 5]
+
+
+reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
+
+# 15
+</code></pre>
+        </section>
+
+        <section>
+          <h3>Logical View of MR Framework</h3>
+
+          <img src="map-reduce.png" alt="Map Reduce" />
+          <br />
+          <small>http://highlyscalable.wordpress.com/2012/02/01/mapreduce-patterns/</small>
+        </section>
+        
+        <section>
+          <h2>Let's solve some problems</h2>
+        </section>
+
+
+        <section>
+          <h3>Counting(Summing)</h3>
+          <br />
+<pre><code contenteditable>
+class Mapper
+   method Map(docid id, doc d)
+      for all term t in doc d do
+         Emit(term t, count 1)
+ 
+class Reducer
+   method Reduce(term t, counts [c1, c2,...])
+      sum = 0
+      for all count c in [c1, c2,...] do
+          sum = sum + c
+      Emit(term t, count sum)
+</code>
+</pre>
+        <br />
+        <small>http://highlyscalable.wordpress.com/2012/02/01/mapreduce-patterns/</small>
+	        </section>
+        <section>
+          <h3>Inverted Index</h3>
+          <br />
+<pre><code contenteditable>
+class Mapper
+   method Map(docid id, doc d)
+      for all term t in doc d do
+         Emit(term t, id)
+ 
+class Reducer
+   method Reduce(term t, ids [id1, id2,...])
+      Emit(term t, ids.join(', '))
+</code></pre>
+        </section>
+
+<section>
+  <h3>Filtering</h3>
+  <br />
+<pre><code contenteditable>
+class Mapper
+   method Map(docid id, doc d)
+      for all term t in doc d do
+         if filter(t)
+           Emit(term t, null)
+ 
+</code></pre>
+ </section>
+
+<section>
+  <h2>Java code</h2>
+</section>
+
+<section>
+  <h3>Mapper</h3>
+  <br />
+<pre><code contenteditable>
+  public static class MapClass extends MapReduceBase
+    implements Mapper<LongWritable, Text, Text, IntWritable> {
+
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
+
+    public void map(LongWritable key, Text value,
+                    OutputCollector<Text, IntWritable> output,
+                    Reporter reporter) throws IOException {
+      String line = value.toString();
+      StringTokenizer itr = new StringTokenizer(line);
+      while (itr.hasMoreTokens()) {
+        word.set(itr.nextToken());
+        output.collect(word, one);
+      }
+    }
+  }
+ 
+</code></pre>
+ </section>
+
+<section>
+  <h3>Reducer</h3>
+  <br />
+
+<pre><code contenteditable>
+  public static class Reduce extends MapReduceBase
+    implements Reducer<Text, IntWritable, Text, IntWritable> {
+
+    public void reduce(Text key, Iterator<IntWritable> values,
+                       OutputCollector<Text, IntWritable> output,
+                       Reporter reporter) throws IOException {
+      int sum = 0;
+      while (values.hasNext()) {
+        sum += values.next().get();
+      }
+      output.collect(key, new IntWritable(sum));
+    }
+  }
+</code>
+</pre>
+</section>
+<section>
+  <h3>Job</h3>
+  <br />
+
+<pre><code contenteditable>
+  public static void main(String[] args) throws Exception {
+     Configuration conf = new Configuration();
+         
+         Job job = new Job(conf, "wordcount");
+     
+     job.setOutputKeyClass(Text.class);
+     job.setOutputValueClass(IntWritable.class);
+         
+     job.setMapperClass(Map.class);
+     job.setReducerClass(Reduce.class);
+         
+     job.setInputFormatClass(TextInputFormat.class);
+     job.setOutputFormatClass(TextOutputFormat.class);
+         
+     FileInputFormat.addInputPath(job, new Path(args[0]));
+     FileOutputFormat.setOutputPath(job, new Path(args[1]));
+         
+     job.waitForCompletion(true);
+  }
+
+</code>
+</pre>
+</section>
+
+<section>
+  <h3>Running all the stuff</h3>
+
+<pre><code contenteditable>
+$ hadoop jar wordcount.jar wordcount -m [number of mappers] -r [number of reducers] input-dir output-dir
+</code></pre>
+</section>
+		</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
