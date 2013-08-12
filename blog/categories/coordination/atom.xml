@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Coordination | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/coordination/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/coordination/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Coordination in Distributed Systems]]></title>
-    <link href="http://mkhadikov.com/2013/02/15/coordination-in-distributed-systems.html"/>
+    <link href="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html"/>
     <updated>2013-02-15T12:12:00+02:00</updated>
-    <id>http://mkhadikov.com/2013/02/15/coordination-in-distributed-systems</id>
+    <id>http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems</id>
     <content type="html"><![CDATA[<p>Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I've read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.</p>
 
 <p>So what do I mean by coordination? Let's start with the simple one. Common challenge in distributed systems is getting the <em>naming</em> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.</p>

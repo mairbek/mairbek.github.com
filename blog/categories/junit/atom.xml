@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: JUnit | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/junit/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/junit/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Новинки JUnit. Категории.]]></title>
-    <link href="http://mkhadikov.com/2011/03/23/junit.html"/>
+    <link href="http://mairbek.github.com/2011/03/23/junit.html"/>
     <updated>2011-03-23T13:25:00+02:00</updated>
-    <id>http://mkhadikov.com/2011/03/23/junit</id>
+    <id>http://mairbek.github.com/2011/03/23/junit</id>
     <content type="html"><![CDATA[<p>В последнее время во всех проектах где я принимаю участие не обходится без автоматизированного тестирования. Везде есть unit тесты, плюс разработку часто сопровождают попытки покрыть код тестами на <em>Selenium</em>.</p>
 
 <p>Первый вопрос который стоит перед командой при написании автоматизированных тестов -- как мы будем запускать тесты? Точнее -- какой фреймворк для тестирования нам выбрать? Если мы программируем на <em>Java</em>, выбор не велик. <em>JUnit</em> или <em>TestNG</em>.</p>

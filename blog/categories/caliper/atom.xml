@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Caliper | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/caliper/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/caliper/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
     <updated>2012-01-09T13:07:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
     <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
 
 <p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>

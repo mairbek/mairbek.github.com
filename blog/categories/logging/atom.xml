@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Logging | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/logging/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/logging/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Logging Gotcha (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/21/logging-gotcha.html"/>
+    <link href="http://mairbek.github.com/2012/01/21/logging-gotcha.html"/>
     <updated>2012-01-21T13:02:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/21/logging-gotcha</id>
+    <id>http://mairbek.github.com/2012/01/21/logging-gotcha</id>
     <content type="html"><![CDATA[<p>Любое мало-мальски уважающее себя приложение не обходится без логгирования. Конечно, ведь иначе работа аппликухи в продакшне превращается в черный ящик.</p>
 
 <p>Современные библиотеки позволяют сохранять информацию на различных уровнях логгирования. В проектах, в которых я участвовал, обычно используется четыре уровня логгирования:</p>

@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Tail Spin]]></title>
-  <link href="http://mkhadikov.com/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Graph Search Architecture Overview]]></title>
-    <link href="http://mkhadikov.com/2013/02/16/graph-search-architecture-overview.html"/>
+    <link href="http://mairbek.github.com/2013/02/16/graph-search-architecture-overview.html"/>
     <updated>2013-02-16T12:16:00+02:00</updated>
-    <id>http://mkhadikov.com/2013/02/16/graph-search-architecture-overview</id>
+    <id>http://mairbek.github.com/2013/02/16/graph-search-architecture-overview</id>
     <content type="html"><![CDATA[<p>Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I&#8217;ve attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his <a href="http://en.wikipedia.org/wiki/Lars_Rasmussen_(software_developer)" title="Lars Rasmussen">resume</a>.</p>
 
 <p>Now <a href="http://incubator.apache.org/wave/" title="Apache Wave">Wave is dead</a>, Lars works for <a href="http://facebook.com/" title="Facebook">Facebook</a>, and they&#8217;ve recently announced <a href="https://www.facebook.com/about/graphsearch" title="Graph Search">graph search</a>, a technology that allows you to search anything shared with you on Facebook. I&#8217;ve been interested in the technical details for a while and lately I&#8217;ve found Lars <a href="http://www.reddit.com/r/IAmA/comments/18jb6d/i_am_the_pointyhaired_engineering_director_for/" title="Answers on reddit">answering questions on Reddit</a>. So for those who are lazy to read whole Q/As I&#8217;ve written a quick summary of graph search architecture quoting author as much as possible.</p>
@@ -50,9 +50,9 @@
   
   <entry>
     <title type="html"><![CDATA[Coordination in Distributed Systems]]></title>
-    <link href="http://mkhadikov.com/2013/02/15/coordination-in-distributed-systems.html"/>
+    <link href="http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems.html"/>
     <updated>2013-02-15T12:12:00+02:00</updated>
-    <id>http://mkhadikov.com/2013/02/15/coordination-in-distributed-systems</id>
+    <id>http://mairbek.github.com/2013/02/15/coordination-in-distributed-systems</id>
     <content type="html"><![CDATA[<p>Facing a coordination problem is almost one hundred percent guaranteed if you are working on a distributed system. Despite that we might strive for <a href="http://en.wikipedia.org/wiki/Shared_nothing_architecture">shared nothing architecture</a> where every node is able to work independently from others, there are tasks that simply require at least decent amount of coordination activity. Most of articles I&#8217;ve read about coordination are either academic or focused on a concrete solution instead of describing the problem in general. In this article I would like to give an overview of coordination problems that are common for distributed systems.</p>
 
 <p>So what do I mean by coordination? Let&#8217;s start with the simple one. Common challenge in distributed systems is getting the <em>naming</em> right. Many distributed algorithms should be able to distinguish one process from another in order to work correctly. The trick is to come up with the that works in a distributed way, gives a processes unambiguously identifiable names among the system, and could support dynamic addition and removal of the nodes in cluster.</p>
@@ -71,9 +71,9 @@
   
   <entry>
     <title type="html"><![CDATA[Programs Should be Small]]></title>
-    <link href="http://mkhadikov.com/2012/02/02/programs-should-be-small.html"/>
+    <link href="http://mairbek.github.com/2012/02/02/programs-should-be-small.html"/>
     <updated>2012-02-02T12:03:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/02/02/programs-should-be-small</id>
+    <id>http://mairbek.github.com/2012/02/02/programs-should-be-small</id>
     <content type="html"><![CDATA[<h2>Evolution of software matters</h2>
 
 <p>How big is the source code you are working on? How many developers do you have in your team? If you are going to add new feature tomorrow, how fast will you be able to do that?</p>
@@ -100,9 +100,9 @@
   
   <entry>
     <title type="html"><![CDATA[Logging Gotcha (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/21/logging-gotcha.html"/>
+    <link href="http://mairbek.github.com/2012/01/21/logging-gotcha.html"/>
     <updated>2012-01-21T13:02:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/21/logging-gotcha</id>
+    <id>http://mairbek.github.com/2012/01/21/logging-gotcha</id>
     <content type="html"><![CDATA[<p>Любое мало-мальски уважающее себя приложение не обходится без логгирования. Конечно, ведь иначе работа аппликухи в продакшне превращается в черный ящик.</p>
 
 <p>Современные библиотеки позволяют сохранять информацию на различных уровнях логгирования. В проектах, в которых я участвовал, обычно используется четыре уровня логгирования:</p>
@@ -171,9 +171,9 @@
   
   <entry>
     <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
     <updated>2012-01-09T13:07:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
     <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
 
 <p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>
@@ -353,9 +353,9 @@
   
   <entry>
     <title type="html"><![CDATA[To GWT or not to GWT (Rus)]]></title>
-    <link href="http://mkhadikov.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
+    <link href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
     <updated>2011-05-14T13:13:00+03:00</updated>
-    <id>http://mkhadikov.com/2011/05/14/to-gwt-or-not-to-gwt</id>
+    <id>http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt</id>
     <content type="html"><![CDATA[<p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript&#8217;e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
 
 <p>В последнее время мне удалось поработать с GWT, итак за и против.</p>
@@ -384,9 +384,9 @@
   
   <entry>
     <title type="html"><![CDATA[ZooKeeper Intro (Rus)]]></title>
-    <link href="http://mkhadikov.com/2011/05/11/zookeeper.html"/>
+    <link href="http://mairbek.github.com/2011/05/11/zookeeper.html"/>
     <updated>2011-05-11T13:16:00+03:00</updated>
-    <id>http://mkhadikov.com/2011/05/11/zookeeper</id>
+    <id>http://mairbek.github.com/2011/05/11/zookeeper</id>
     <content type="html"><![CDATA[<p>Любое распределенное приложение не может обойтись без центрального сервиса, который координирует процессы в нем. Реализовывать координацию можно, однако разработка отказоустйчивой системы координации без deadlock&#8217;ов и race conditions &#8211; задача не из тривиальных. Проект <em>Apache ZooKeeper</em> призван избавить нас от решения этой проблемы.</p>
 
 <p><em>ZooKeeper</em> &#8211; это распределенный, open-source сервис координнации для расспределенных приложений. Он предоставляет низкоуровневый API, с помощью которого приложения могут реализовать высокоуровневые сервисы для координации и синхронизации процессов в расспредеелнной системе.</p>
@@ -408,9 +408,9 @@
   
   <entry>
     <title type="html"><![CDATA[Не бойтесть автоматизировать]]></title>
-    <link href="http://mkhadikov.com/2011/04/03/automation.html"/>
+    <link href="http://mairbek.github.com/2011/04/03/automation.html"/>
     <updated>2011-04-03T13:21:00+03:00</updated>
-    <id>http://mkhadikov.com/2011/04/03/automation</id>
+    <id>http://mairbek.github.com/2011/04/03/automation</id>
     <content type="html"><![CDATA[<p>Использование автоматизированных тестов на <a href="http://seleniumhq.org/" title="Selenium">selenium</a> в качестве приемочных тестов становится распространненой тенденцией в индустрии разработки программного обеспечения. Об этом свидельствует успех прошедшей недавно конференции <a href="http://seleniumcamp.com/" title="Selenium Camp">Selenium Camp</a>, на которой Ваш покорный слуга выступал докладчиком. Отчасти этому способствует активная пропоганда от agile сообщества, отчасти наличием success stories от гигантов индустрии, таких как, например, <a href="http://google.com/" title="Google">Google</a>, который является главным конрибьютером в новую, вторую, версию селениума.</p>
 
 <p>Однако, нужны ли нам автоматизированные тесты, если у нас в команде есть группа тестировщиков или QA-инженеров, способных обеспечить качество проекта на должном уровне? Я считаю, что автоматизированные тесты дополняют QA-инжеров, избавляя их от ненужной рутинной работы. Зачем тратить время на регрессию, если ее может сделать за тебя компьютер?</p>
@@ -427,9 +427,9 @@
   
   <entry>
     <title type="html"><![CDATA[Новинки JUnit. Категории.]]></title>
-    <link href="http://mkhadikov.com/2011/03/23/junit.html"/>
+    <link href="http://mairbek.github.com/2011/03/23/junit.html"/>
     <updated>2011-03-23T13:25:00+02:00</updated>
-    <id>http://mkhadikov.com/2011/03/23/junit</id>
+    <id>http://mairbek.github.com/2011/03/23/junit</id>
     <content type="html"><![CDATA[<p>В последнее время во всех проектах где я принимаю участие не обходится без автоматизированного тестирования. Везде есть unit тесты, плюс разработку часто сопровождают попытки покрыть код тестами на <em>Selenium</em>.</p>
 
 <p>Первый вопрос который стоит перед командой при написании автоматизированных тестов &#8211; как мы будем запускать тесты? Точнее &#8211; какой фреймворк для тестирования нам выбрать? Если мы программируем на <em>Java</em>, выбор не велик. <em>JUnit</em> или <em>TestNG</em>.</p>

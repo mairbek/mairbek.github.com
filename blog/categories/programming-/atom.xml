@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Programming, | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/programming-/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/programming-/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Programs Should be Small]]></title>
-    <link href="http://mkhadikov.com/2012/02/02/programs-should-be-small.html"/>
+    <link href="http://mairbek.github.com/2012/02/02/programs-should-be-small.html"/>
     <updated>2012-02-02T12:03:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/02/02/programs-should-be-small</id>
+    <id>http://mairbek.github.com/2012/02/02/programs-should-be-small</id>
     <content type="html"><![CDATA[<h2>Evolution of software matters</h2>
 
 <p>How big is the source code you are working on? How many developers do you have in your team? If you are going to add new feature tomorrow, how fast will you be able to do that?</p>

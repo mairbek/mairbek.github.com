@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Java | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/java/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/java/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Logging Gotcha (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/21/logging-gotcha.html"/>
+    <link href="http://mairbek.github.com/2012/01/21/logging-gotcha.html"/>
     <updated>2012-01-21T13:02:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/21/logging-gotcha</id>
+    <id>http://mairbek.github.com/2012/01/21/logging-gotcha</id>
     <content type="html"><![CDATA[<p>Любое мало-мальски уважающее себя приложение не обходится без логгирования. Конечно, ведь иначе работа аппликухи в продакшне превращается в черный ящик.</p>
 
 <p>Современные библиотеки позволяют сохранять информацию на различных уровнях логгирования. В проектах, в которых я участвовал, обычно используется четыре уровня логгирования:</p>
@@ -80,9 +80,9 @@ log.debug("Processed request {} sending response {}", request, response);
   
   <entry>
     <title type="html"><![CDATA[Microbenchmarking with Caliper (Rus)]]></title>
-    <link href="http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper.html"/>
+    <link href="http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper.html"/>
     <updated>2012-01-09T13:07:00+02:00</updated>
-    <id>http://mkhadikov.com/2012/01/09/microbenchmarking-with-caliper</id>
+    <id>http://mairbek.github.com/2012/01/09/microbenchmarking-with-caliper</id>
     <content type="html"><![CDATA[<p>Бывает, что перед нами, разработчиками, возникает проблема выбора той или иной реализации алгоритма или структуры данных подходящей для решения текущей задачи.</p>
 
 <p>Чаще всего, конечно, можно воспользоваться <a href="http://google.com" title="Google">гуглом</a>, задать вопрос на <a href="http://stackoverflow.com" title="StackOverflow">stackoverflow</a>, но в некоторых ситуациях ничего не остается, кроме как провести эксперименты самому.</p>
@@ -196,9 +196,9 @@ public static void main(String[] args) {
   
   <entry>
     <title type="html"><![CDATA[To GWT or not to GWT (Rus)]]></title>
-    <link href="http://mkhadikov.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
+    <link href="http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt.html"/>
     <updated>2011-05-14T13:13:00+03:00</updated>
-    <id>http://mkhadikov.com/2011/05/14/to-gwt-or-not-to-gwt</id>
+    <id>http://mairbek.github.com/2011/05/14/to-gwt-or-not-to-gwt</id>
     <content type="html"><![CDATA[<p>Прошло время, когда web-разработка заключалась в обработке HTTP запросов и рендеринге соответсвующей html странички. Сейчас, куда не плюнь, везде требуется Rich UI. У java разработчика есть выбор: либо писать rich ui на javascript'e, либо воспользоватся GWT платформой, и писать на родимой жаве.</p>
 
 <p>В последнее время мне удалось поработать с GWT, итак за и против.</p>

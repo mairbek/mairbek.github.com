@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://mkhadikov.com/sitemap.xml 
+Sitemap: http://mairbek.github.com/sitemap.xml 

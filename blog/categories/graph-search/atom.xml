@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Graph Search | Tail Spin]]></title>
-  <link href="http://mkhadikov.com/blog/categories/graph-search/atom.xml" rel="self"/>
-  <link href="http://mkhadikov.com/"/>
-  <updated>2013-05-15T13:04:45+03:00</updated>
-  <id>http://mkhadikov.com/</id>
+  <link href="http://mairbek.github.com/blog/categories/graph-search/atom.xml" rel="self"/>
+  <link href="http://mairbek.github.com/"/>
+  <updated>2013-08-12T18:41:45+03:00</updated>
+  <id>http://mairbek.github.com/</id>
   <author>
     <name><![CDATA[Mairbek Khadikov]]></name>
     <email><![CDATA[mkhadikov@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Graph Search Architecture Overview]]></title>
-    <link href="http://mkhadikov.com/2013/02/16/graph-search-architecture-overview.html"/>
+    <link href="http://mairbek.github.com/2013/02/16/graph-search-architecture-overview.html"/>
     <updated>2013-02-16T12:16:00+02:00</updated>
-    <id>http://mkhadikov.com/2013/02/16/graph-search-architecture-overview</id>
+    <id>http://mairbek.github.com/2013/02/16/graph-search-architecture-overview</id>
     <content type="html"><![CDATA[<p>Back in 2009 me and my colleagues traveled to Moscow to visit Google Developers Day. It has been very first international development conference I've attended and the most excited one. As you may remember these days were Google Wave days. The hype was enormous and I had a chance to chat with Lars Rasmussen, one of the most influential people in the industry, a person who simply makes innovation happen. Well, just check out his <a href="http://en.wikipedia.org/wiki/Lars_Rasmussen_(software_developer)" title="Lars Rasmussen">resume</a>.</p>
 
 <p>Now <a href="http://incubator.apache.org/wave/" title="Apache Wave">Wave is dead</a>, Lars works for <a href="http://facebook.com/" title="Facebook">Facebook</a>, and they've recently announced <a href="https://www.facebook.com/about/graphsearch" title="Graph Search">graph search</a>, a technology that allows you to search anything shared with you on Facebook. I've been interested in the technical details for a while and lately I've found Lars <a href="http://www.reddit.com/r/IAmA/comments/18jb6d/i_am_the_pointyhaired_engineering_director_for/" title="Answers on reddit">answering questions on Reddit</a>. So for those who are lazy to read whole Q/As I've written a quick summary of graph search architecture quoting author as much as possible.</p>
