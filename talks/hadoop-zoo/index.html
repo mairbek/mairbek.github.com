@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Hadoop Zoo - Mairbek Khadikov</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+    <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-29152018-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ 
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+          <h2>Apache Hadoop Talks</h2>
+          <br/>
+					<h4>Akvelon, Kharkiv</h4>
+          <br/>
+					<p>
+						<small>By <a href="http://mairbek.github.com">Mairbek Khadikov</a> / <a href="http://twitter.com/mairbek">@mairbek</a></small>
+					</p>
+				</section>
+
+        <section>
+          <h2>Previous talk revamp</h2>
+        </section>
+
+        <section>
+          <h2>Previous talk revamp</h2>
+
+          <p>Any Questions?</p>
+        </section>
+
+        <section>
+          <h2>Hadoop Zoo</h2>
+
+          <ul>
+            <li>Ambari</li>
+            <li>Avro</li>
+            <li>Chukwa</li>
+            <li>HBase</li>
+            <li>Hive</li>
+            <li>Mahout</li>
+            <li>Pig</li>
+            <li>ZooKeeper</li>
+            <li>More stuff in incubator</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Zookeeper</h2>
+
+          <p>Distributed coordiation service</p>
+        </section>
+
+        <section>
+          <h2>Coordination</h2>
+
+          <p>Any distributed system needs some kind of coordination.</p>
+        </section>
+
+        <section>
+          <h2>Coordination</h2>
+
+          <ul>
+            <li>Synchronization</li>
+            <li>Configuration Maintenance</li>
+            <li>Naming</li>
+            <li>Groups</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Coordination</h2>
+
+          <p>Challenging to implement right</p>
+        </section>
+
+        <section>
+          <h2>Coordination</h2>
+
+          <p>High availability is the most important requirement</p>
+        </section>
+
+        <section>
+          <h2>Zookeeper</h2>
+
+          <p>Simply a data storage</p>
+          <ul>
+            <li>Distributed</li>
+            <li>Scalable</li>
+            <li>Fault Tolerant</li>
+            <li>Open Source</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Zookeeper data model</h2>
+
+          <img src="zk-datamodel.png" alt="ZK Data Model" />
+        </section>
+
+        <section>
+          <h2>ZNode</h2>
+
+          <ul>
+            <li>File</li>
+            <li>Directory</li>
+            <li>Atomic Operations</li>
+            <li>Versions</li>
+            <li>Watches</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Znode Flags</h2>
+
+          <ul>
+            <li>Sequential</li>
+            <li>Ephemeral</li>
+          </ul>
+
+        </section>
+
+        <section>
+          <h2>Sequential</h2>
+          <img src="zk-seq.png" alt="ZK Sequential Flag" />
+        </section>
+
+        <section>
+          <h2>Ephemeral</h2>
+
+          <p>ZNode exists as long as the session that created the znode is active.</p>
+        </section>
+
+        <section>
+          <h2>ZooKeeper Guaranties</h2>
+
+          <ul>
+            <li>Sequential Consistency</li>
+            <li>Atomicity</li>
+            <li>Reliability</li>
+            <li>Timelines</li>
+            <li>Single System Image</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Cluster mode</h2>
+          <p>Data stored in memory on each server</p>
+          <img src="zkservice.jpg" alt="" />
+        </section>
+
+        <section>
+          <h2>Cluster mode</h2>
+          <p>Leader is chosen on start</p>
+          <img src="zkservice.jpg" alt="" />
+        </section>
+        <section>
+          <h2>Cluster mode</h2>
+          <p>Client connects to followers</p>
+          <img src="zkservice.jpg" alt="" />
+        </section>
+        <section>
+          <h2>Cluster mode</h2>
+          <p>All changes applied through the leader</p>
+          <img src="zkservice.jpg" alt="" />
+        </section>
+        <section>
+          <h2>Cluster mode</h2>
+          <p>Data is commited when most of the nodes received the update</p>
+          <img src="zkservice.jpg" alt="" />
+        </section>
+
+        <section>
+          <h2>Group Membership</h2>
+          <p>Group has it onw znode</p>
+          <img src="gm1.png" alt="Group Membership" />
+        </section>
+        <section>
+          <h2>Group Membership</h2>
+          <p>Group member creates ephemeral child node</p>
+          <img src="gm2.png" alt="Group Membership" />
+        </section>
+        <section>
+          <h2>Group Membership</h2>
+          <p>In case if member is unavailable znode will be automatically removed</p>
+          <img src="gm3.png" alt="Group Membership" />
+        </section>		
+
+        <section>
+          <h2>Distributed Lock</h2>
+          <p>For shared resource create znode</p>
+          <img src="dl1.png" alt="DL" />
+        </section>
+
+        <section>
+          <h2>Distributed Lock</h2>
+          <p>Every process creates ephemeral&amp;sequential node</p>
+          <img src="dl2.png" alt="DL" />
+        </section>
+
+        <section>
+          <h2>Distributed Lock</h2>
+          <p>Process with smallest number acquires the lock</p>
+          <img src="dl3.png" alt="DL" />
+        </section>
+
+        <section>
+          <h2>Distributed Lock</h2>
+          <p>Other processes watch the node waiting for the removal</p>
+          <img src="dl3.png" alt="DL" />
+        </section>
+
+        <section>
+          <h2>Distributed Lock</h2>
+          <p>To release the lock just remove the znode</p>
+          <img src="dl4.png" alt="DL" />
+        </section>
+
+        <section>
+          <h2>Other receipies</h2>
+
+          <ul>
+            <li>Barier</li>
+            <li>Double Barier</li>
+            <li>Leader election</li>
+            <li>Read-Write Lock</li>
+            <li>Queue</li>
+            <li>Priority Queue</li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>HBase</h1>
+        </section>
+
+        <section>
+          <h2>HBase</h2>
+
+          <p>Open source clone of Google's BigTable</p>
+        </section>
+
+        <section>
+          <h2>HBase</h2>
+
+          <ul>
+            <li>Distributed</li>
+            <li>Not relational</li>
+            <li>Column-oriented</li>
+            <li>Fault tolerant</li>
+            <li>Scales linearly</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>HBase</h2>
+
+          <ul>
+            <li>Auto sharding</li>
+            <li>Auto failover</li>
+            <li>No single point of failure</li>
+            <li>Strongly consistent</li>
+            <li>Built on top of HDFS</li>
+            <li>Supports MapReduce</li>
+          </ul>
+        </section>
+
+        <section>
+            <h2>Say NO</h2>
+
+            <ul>
+              <li>SQL</li>
+              <li>Joins</li>
+              <li>Transactions</li>
+              <li>Secondary Indicies</li>
+            </ul>
+
+        </section>
+
+        <section>
+          <h2>Data Model</h2>
+
+          <p>Map (table, row key, column family:column, timestamp) =&gt; value</p>
+        </section>
+
+
+        <section>
+          <h2>Data Model</h2>
+
+          <br />
+          <p>
+          SortedMap&lt;RowKey, List&lt;SortedMap&lt;CF, List&lt;SortedMap&lt;Column, List&lt;Pair&lt;Value,TimeStamp&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+          </p>
+        </section>
+
+        <section>
+          <h2>HBase Architecture</h2>
+
+          <img src="hbase-files.png" alt="HBase" />
+        </section>
+
+        <section>
+          <h2>When to use HBase</h2>
+
+          <ul>
+            <li><strong>Big</strong> data</li>
+            <li>No schema</li>
+            <li>High write volume</li>
+            <li>Key based access</li>
+            <li>Sequential reads</li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>Pig</h1>
+        </section>
+
+        <section>
+          <h2>Why do we need Pig?</h2>
+        </section>
+
+        <section>
+          <h2>Why do we need Pig?</h2>
+
+          <p>Because writing MapReduce in Java sucks.</p>
+        </section>
+
+        <section>
+          <h2>Pig latin</h2>
+
+          <p>Data flow language to write MapReduce jobs</p>
+        </section>
+
+
+        <section>
+          <h2>Word count in Pig</h2>
+
+<pre><code>
+input_lines = LOAD '/input-file' AS (line:chararray);
+
+words = FOREACH input_lines GENERATE FLATTEN(TOKENIZE(line)) AS word;
+
+word_groups = GROUP words BY word;
+
+word_count = FOREACH word_groups GENERATE COUNT(words) AS count, group AS word;
+
+STORE word_count INTO '/output-file';
+</code>
+</pre>
+        </section>
+
+        <section>
+          <h2>Why Pig?</h2>
+
+          <ul>
+            <li>Less code</li>
+            <li>Less time to implement MapReduce job</li>
+            <li>Easy to read code</li>
+            <li>Easy to learn DSL</li>
+            <li>Reduces Hadoop complexity</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Pig Commands: Load</h2>
+
+          <p>Loads data from the datasource</p>
+        </section>
+
+
+        <section>
+          <h2>Pig Commands: Store</h2>
+
+          <p>Store data to the datasource</p>
+        </section>
+
+        <section>
+          <h2>Pig Commands: Join</h2>
+
+          <p>Joins two or more inputs based on key</p>
+        </section>
+
+        <section>
+          <h2>Pig Commands: Split</h2>
+
+          <p>Split data to several sets based on specified condition</p>
+        </section>
+
+        <section>
+          <h2>Pig Commands: Group</h2>
+
+          <p>Groups records with the same key</p>
+        </section>
+
+        <section>
+          <h2>Pig Commands: Union</h2>
+
+          <p>Merge two datasets</p>
+        </section>
+
+        <section>
+          <h2>Pig != SQL</h2>
+          <br />
+          <ul>
+            <li>Focus on dataflow</li>
+            <li>Nested relational data model</li>
+            <li>Implicit schema</li>
+            <li>Scan centric workload</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Thanks</h2>
+          
+          <h3>See you next time!</h3>
+        </section>
+
+
+      </div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
